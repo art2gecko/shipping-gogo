@@ -9,6 +9,35 @@ import {
 
 const router = Router();
 
+// ─── GET /api/documents (list) ────────────────────────────────────────────────
+router.get("/", async (req, res) => {
+  try {
+    const { type, date } = req.query;
+    const where: Record<string, unknown> = {};
+
+    if (type && typeof type === "string") {
+      where.type = type;
+    }
+    if (date && typeof date === "string") {
+      const start = new Date(date);
+      const end = new Date(date);
+      end.setDate(end.getDate() + 1);
+      where.createdAt = { gte: start, lt: end };
+    }
+
+    const docs = await prisma.document.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: 200,
+    });
+
+    res.json(docs);
+  } catch (err: any) {
+    console.error("List documents failed:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── POST /api/documents/orders/:orderId/packing-slip ────────────────────────
 router.post("/orders/:orderId/packing-slip", async (req, res) => {
   try {
