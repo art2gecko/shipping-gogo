@@ -35,6 +35,9 @@ const auditActionLabels: Record<AuditAction, string> = {
   EXCEPTION_CREATED: "Exception Created",
   EXCEPTION_RESOLVED: "Exception Resolved",
   SETTINGS_UPDATED: "Settings Updated",
+  INTEGRATION_CONNECT: "Integration Connected",
+  INTEGRATION_TEST: "Integration Tested",
+  INTEGRATION_DISCONNECT: "Integration Disconnected",
 };
 
 export default function DashboardPage() {
@@ -53,13 +56,10 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-4 p-4 lg:p-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Today's fulfillment overview</p>
-        </div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-muted-foreground">Today's fulfillment overview</p>
         <div className="flex gap-2">
           <Button
             onClick={() => syncOrders.mutate()}

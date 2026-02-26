@@ -104,10 +104,10 @@ export function DataTable<T>({
     <div className={cn("space-y-2", className)}>
       <div className="rounded-md border overflow-auto">
         <table className="w-full text-sm">
-          <thead>
+          <thead className="sticky top-0 z-10">
             <tr className="border-b bg-muted/50">
               {selectable && (
-                <th className="w-12 px-4 py-3">
+                <th className="w-10 px-3 py-2.5">
                   <Checkbox
                     checked={allSelected}
                     onCheckedChange={toggleAll}
@@ -118,8 +118,9 @@ export function DataTable<T>({
                 <th
                   key={col.key}
                   className={cn(
-                    "px-4 py-3 text-left font-medium text-muted-foreground",
-                    col.sortable && "cursor-pointer select-none hover:text-foreground",
+                    "px-3 py-2.5 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider",
+                    col.sortable &&
+                      "cursor-pointer select-none hover:text-foreground",
                     col.className,
                   )}
                   onClick={col.sortable ? () => toggleSort(col.key) : undefined}
@@ -127,15 +128,15 @@ export function DataTable<T>({
                   <div className="flex items-center gap-1">
                     {col.header}
                     {col.sortable && (
-                      <span className="ml-1">
+                      <span className="ml-0.5">
                         {sortKey === col.key ? (
                           sortDir === "asc" ? (
-                            <ChevronUp className="h-4 w-4" />
+                            <ChevronUp className="h-3.5 w-3.5" />
                           ) : (
-                            <ChevronDown className="h-4 w-4" />
+                            <ChevronDown className="h-3.5 w-3.5" />
                           )
                         ) : (
-                          <ChevronsUpDown className="h-3.5 w-3.5 opacity-40" />
+                          <ChevronsUpDown className="h-3 w-3 opacity-40" />
                         )}
                       </span>
                     )}
@@ -149,7 +150,7 @@ export function DataTable<T>({
               <tr>
                 <td
                   colSpan={columns.length + (selectable ? 1 : 0)}
-                  className="px-4 py-12 text-center text-muted-foreground"
+                  className="px-3 py-12 text-center text-muted-foreground"
                 >
                   {emptyMessage}
                 </td>
@@ -162,14 +163,17 @@ export function DataTable<T>({
                   <tr
                     key={key}
                     className={cn(
-                      "border-b transition-colors hover:bg-muted/50",
+                      "border-b transition-colors hover:bg-muted/40",
                       selected && "bg-primary/5",
                       onRowClick && "cursor-pointer",
                     )}
                     onClick={() => onRowClick?.(row)}
                   >
                     {selectable && (
-                      <td className="w-12 px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                      <td
+                        className="w-10 px-3 py-2.5"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <Checkbox
                           checked={selected}
                           onCheckedChange={() => toggleRow(key)}
@@ -177,7 +181,10 @@ export function DataTable<T>({
                       </td>
                     )}
                     {columns.map((col) => (
-                      <td key={col.key} className={cn("px-4 py-3", col.className)}>
+                      <td
+                        key={col.key}
+                        className={cn("px-3 py-2.5", col.className)}
+                      >
                         {col.render(row)}
                       </td>
                     ))}
@@ -189,8 +196,8 @@ export function DataTable<T>({
         </table>
       </div>
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-2">
-          <p className="text-sm text-muted-foreground">
+        <div className="flex items-center justify-between px-1">
+          <p className="text-xs text-muted-foreground">
             {selectedKeys && selectedKeys.size > 0
               ? `${selectedKeys.size} selected · `
               : ""}
@@ -200,21 +207,23 @@ export function DataTable<T>({
             <Button
               variant="outline"
               size="sm"
+              className="h-7 w-7 p-0"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={page === 0}
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-3.5 w-3.5" />
             </Button>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               {page + 1} / {totalPages}
             </span>
             <Button
               variant="outline"
               size="sm"
+              className="h-7 w-7 p-0"
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={page >= totalPages - 1}
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3.5 w-3.5" />
             </Button>
           </div>
         </div>
