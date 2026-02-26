@@ -1,0 +1,350 @@
+// ─── Fulfillment Orchestrator – Prisma Schema ────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum ChannelType {
+  AMAZON
+  EBAY
+  WALMART
+  TEMU
+  OTHER
+}
+
+enum OrderStatus {
+  NEW
+  READY
+  HOLD
+  SHIPPED
+  CANCELED
+}
+
+enum ShipmentStatus {
+  PENDING
+  LABEL_PURCHASED
+  PACKED
+  SHIPPED
+  ERROR
+}
+
+enum LabelSource {
+  AMAZON_BUY_SHIPPING
+  WALMART_SWW
+  EBAY_LABELS
+  TEMU_LABELS
+  CARRIER_API
+  MANUAL
+}
+
+enum DocumentType {
+  PICK_LIST
+  PACKING_SLIP
+  LABEL
+  MANIFEST
+  EXPORT
+}
+
+enum ExceptionType {
+  ADDRESS_INVALID
+  SERIAL_MISSING
+  SERIAL_INVALID
+  LABEL_PURCHASE_FAILED
+  TRACKING_UPLOAD_FAILED
+  API_AUTH_FAILED
+  UNKNOWN
+}
+
+enum UserRole {
+  ADMIN
+  WAREHOUSE
+}
+
+enum AuditAction {
+  ORDER_IMPORTED
+  ORDER_UPDATED
+  BATCH_CREATED
+  LABEL_PURCHASED
+  LABEL_REPRINTED
+  SERIAL_SCANNED
+  DOCUMENT_CREATED
+  TRACKING_UPLOADED
+  EXCEPTION_CREATED
+  EXCEPTION_RESOLVED
+  SETTINGS_UPDATED
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model User {
+  id           String      @id @default(uuid())
+  username     String      @unique
+  passwordHash String      @map("password_hash")
+  role         UserRole    @default(WAREHOUSE)
+  active       Boolean     @default(true)
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  auditLogs AuditLog[]
+
+  @@map("users")
+}
+
+model ChannelCredential {
+  id          String      @id @default(uuid())
+  channel     ChannelType
+  storeName   String      @map("store_name")
+  credentials Json        // OAuth tokens, API keys, etc.
+  settings    Json?       // channel-specific config
+  active      Boolean     @default(true)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@unique([channel, storeName])
+  @@map("channel_credentials")
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  channel         ChannelType
+  externalOrderId String      @map("external_order_id")
+  status          OrderStatus @default(NEW)
+
+  // Normalized buyer / shipping info
+  buyerName       String      @map("buyer_name")
+  shipToName      String      @map("ship_to_name")
+  shipToAddress1  String      @map("ship_to_address1")
+  shipToAddress2  String?     @map("ship_to_address2")
+  shipToCity      String      @map("ship_to_city")
+  shipToState     String      @map("ship_to_state")
+  shipToZip       String      @map("ship_to_zip")
+  shipToCountry   String      @default("US") @map("ship_to_country")
+
+  // Hold / notes
+  holdReason      String?     @map("hold_reason")
+  notes           String?
+
+  orderDate       DateTime    @map("order_date")
+  importedAt      DateTime    @default(now()) @map("imported_at")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  items       OrderItem[]
+  shipment    Shipment?
+  batchOrders BatchOrder[]
+  documents   Document[]
+  exceptions  Exception[]
+  auditLogs   AuditLog[]
+
+  @@unique([channel, externalOrderId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([channel])
+  @@map("orders")
+}
+
+model OrderItem {
+  id             String  @id @default(uuid())
+  orderId        String  @map("order_id")
+  sku            String
+  title          String
+  quantity       Int
+  unitPrice      Decimal @default(0) @map("unit_price") @db.Decimal(10, 2)
+  serialRequired Boolean @default(false) @map("serial_required")
+  binLocation    String? @map("bin_location")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  order          Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  serialCaptures SerialCapture[]
+
+  @@index([sku])
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model Shipment {
+  id             String         @id @default(uuid())
+  orderId        String         @unique @map("order_id")
+  status         ShipmentStatus @default(PENDING)
+
+  carrierCode    String?        @map("carrier_code")
+  serviceCode    String?        @map("service_code")
+  trackingNumber String?        @map("tracking_number")
+  shipDate       DateTime?      @map("ship_date")
+
+  weightOz       Decimal?       @map("weight_oz") @db.Decimal(8, 2)
+  lengthIn       Decimal?       @map("length_in") @db.Decimal(6, 2)
+  widthIn        Decimal?       @map("width_in") @db.Decimal(6, 2)
+  heightIn       Decimal?       @map("height_in") @db.Decimal(6, 2)
+
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  labels Label[]
+
+  @@index([status])
+  @@map("shipments")
+}
+
+model Label {
+  id             String      @id @default(uuid())
+  shipmentId     String      @map("shipment_id")
+  source         LabelSource
+  trackingNumber String?     @map("tracking_number")
+  carrierCode    String?     @map("carrier_code")
+  cost           Decimal?    @db.Decimal(10, 2)
+  filePath       String?     @map("file_path")
+
+  // Idempotency: prevent duplicate purchases
+  idempotencyKey String      @unique @map("idempotency_key")
+
+  purchasedAt    DateTime    @default(now()) @map("purchased_at")
+  createdAt      DateTime    @default(now()) @map("created_at")
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId])
+  @@index([trackingNumber])
+  @@map("labels")
+}
+
+model SerialCapture {
+  id          String   @id @default(uuid())
+  orderItemId String   @map("order_item_id")
+  serialCode  String   @map("serial_code")
+  scannedAt   DateTime @default(now()) @map("scanned_at")
+  scannedBy   String?  @map("scanned_by")
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  @@unique([orderItemId, serialCode])
+  @@index([serialCode])
+  @@map("serial_captures")
+}
+
+model Batch {
+  id        String   @id @default(uuid())
+  name      String
+  strategy  String?  // e.g. "single_sku", "multi_sku", "priority"
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  batchOrders BatchOrder[]
+  documents   Document[]
+  auditLogs   AuditLog[]
+
+  @@index([createdAt])
+  @@map("batches")
+}
+
+model BatchOrder {
+  id       String @id @default(uuid())
+  batchId  String @map("batch_id")
+  orderId  String @map("order_id")
+  position Int    @default(0) // sort order within wave
+
+  batch Batch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([batchId, orderId])
+  @@map("batch_orders")
+}
+
+model Document {
+  id        String       @id @default(uuid())
+  type      DocumentType
+  filePath  String       @map("file_path") // relative to SHIPMENT_ROOT
+  fileName  String       @map("file_name")
+  mimeType  String       @default("application/pdf") @map("mime_type")
+  sizeBytes Int?         @map("size_bytes")
+
+  orderId   String?      @map("order_id")
+  batchId   String?      @map("batch_id")
+
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  batch Batch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([orderId])
+  @@index([batchId])
+  @@map("documents")
+}
+
+model Exception {
+  id         String        @id @default(uuid())
+  type       ExceptionType
+  message    String
+  resolved   Boolean       @default(false)
+  resolvedAt DateTime?     @map("resolved_at")
+  resolvedBy String?       @map("resolved_by")
+
+  orderId    String?       @map("order_id")
+  context    Json?         // arbitrary details
+
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([resolved])
+  @@index([createdAt])
+  @@map("exceptions")
+}
+
+model AuditLog {
+  id        String      @id @default(uuid())
+  action    AuditAction
+  detail    String?
+  metadata  Json?
+
+  userId    String?     @map("user_id")
+  orderId   String?     @map("order_id")
+  batchId   String?     @map("batch_id")
+
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  batch Batch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+
+  @@index([action])
+  @@index([createdAt])
+  @@index([orderId])
+  @@map("audit_logs")
+}
+
+model InventoryLocation {
+  id       String  @id @default(uuid())
+  sku      String
+  binCode  String  @map("bin_code") // e.g. "A-01-03"
+  shelf    String?
+  barcode  String? @unique
+  quantity Int     @default(0)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([sku, binCode])
+  @@index([sku])
+  @@map("inventory_locations")
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
