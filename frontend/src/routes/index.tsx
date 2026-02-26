@@ -11,6 +11,7 @@ import ExceptionsPage from "@/pages/exceptions";
 import SerialCapturePage from "@/pages/serial-capture";
 import DocumentsPage from "@/pages/documents";
 import SettingsPage from "@/pages/settings";
+import IntegrationsPage from "@/pages/integrations";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -92,6 +93,14 @@ export function AppRouter() {
           element={
             <ProtectedRoute>
               <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings/integrations"
+          element={
+            <ProtectedRoute>
+              <IntegrationsPage />
             </ProtectedRoute>
           }
         />

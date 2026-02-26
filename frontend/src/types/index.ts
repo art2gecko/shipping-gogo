@@ -7,7 +7,9 @@ export type LabelSource = "AMAZON_BUY_SHIPPING" | "WALMART_SWW" | "EBAY_LABELS" 
 export type DocumentType = "PICK_LIST" | "PACKING_SLIP" | "LABEL" | "MANIFEST" | "EXPORT";
 export type ExceptionType = "ADDRESS_INVALID" | "SERIAL_MISSING" | "SERIAL_INVALID" | "LABEL_PURCHASE_FAILED" | "TRACKING_UPLOAD_FAILED" | "API_AUTH_FAILED" | "UNKNOWN";
 export type UserRole = "ADMIN" | "WAREHOUSE";
-export type AuditAction = "ORDER_IMPORTED" | "ORDER_UPDATED" | "BATCH_CREATED" | "LABEL_PURCHASED" | "LABEL_REPRINTED" | "SERIAL_SCANNED" | "DOCUMENT_CREATED" | "TRACKING_UPLOADED" | "EXCEPTION_CREATED" | "EXCEPTION_RESOLVED" | "SETTINGS_UPDATED";
+export type AuditAction = "ORDER_IMPORTED" | "ORDER_UPDATED" | "BATCH_CREATED" | "LABEL_PURCHASED" | "LABEL_REPRINTED" | "SERIAL_SCANNED" | "DOCUMENT_CREATED" | "TRACKING_UPLOADED" | "EXCEPTION_CREATED" | "EXCEPTION_RESOLVED" | "SETTINGS_UPDATED" | "INTEGRATION_CONNECT" | "INTEGRATION_TEST" | "INTEGRATION_DISCONNECT";
+export type AccountStatus = "OK" | "ERROR" | "NEEDS_REAUTH";
+export type IntegrationChannel = "AMAZON" | "EBAY" | "TEMU";
 
 // ── Models ──
 
@@ -194,6 +196,32 @@ export interface ResolveExceptionPayload {
 export interface CaptureSerialPayload {
   orderItemId: string;
   serialCode: string;
+}
+
+export interface ChannelAccount {
+  id: string;
+  channel: IntegrationChannel;
+  accountName: string;
+  externalSellerId: string | null;
+  status: AccountStatus;
+  scopes: string | null;
+  lastSyncedAt: string | null;
+  tokenExpiresAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TestConnectionResult {
+  ok: boolean;
+  status: AccountStatus;
+  message: string;
+}
+
+export interface TemuManualConnectPayload {
+  accountName: string;
+  accessToken: string;
+  refreshToken?: string;
+  externalSellerId?: string;
 }
 
 export interface PaginatedResponse<T> {

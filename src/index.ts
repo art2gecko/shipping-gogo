@@ -11,6 +11,7 @@ import auditLogsRouter from "./routes/auditLogs";
 import settingsRouter from "./routes/settings";
 import usersRouter from "./routes/users";
 import jobsRouter from "./routes/jobs";
+import integrationsRouter from "./routes/integrations";
 
 const app = express();
 const PORT = parseInt(process.env.PORT ?? "3000", 10);
@@ -32,6 +33,7 @@ app.use("/api/audit-logs", auditLogsRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/jobs", jobsRouter);
+app.use("/api/integrations", integrationsRouter);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });

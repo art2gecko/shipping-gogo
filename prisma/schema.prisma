@@ -79,9 +79,51 @@ enum AuditAction {
   EXCEPTION_CREATED
   EXCEPTION_RESOLVED
   SETTINGS_UPDATED
+  INTEGRATION_CONNECT
+  INTEGRATION_TEST
+  INTEGRATION_DISCONNECT
+}
+
+enum AccountStatus {
+  OK
+  ERROR
+  NEEDS_REAUTH
 }
 
 // ─── Models ──────────────────────────────────────────────────────────────────
+
+model ChannelAccount {
+  id                    String        @id @default(cuid())
+  channel               ChannelType
+  accountName           String        @map("account_name")
+  externalSellerId      String?       @map("external_seller_id")
+  status                AccountStatus @default(OK)
+  scopes                String?
+  refreshTokenEncrypted String?       @map("refresh_token_encrypted")
+  accessTokenEncrypted  String?       @map("access_token_encrypted")
+  tokenExpiresAt        DateTime?     @map("token_expires_at")
+  rawMeta               Json?         @map("raw_meta")
+  lastSyncedAt          DateTime?     @map("last_synced_at")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+
+  orders Order[]
+
+  @@unique([channel, externalSellerId])
+  @@index([channel, status])
+  @@map("channel_accounts")
+}
+
+model IntegrationState {
+  id        String   @id @default(cuid())
+  state     String   @unique
+  channel   ChannelType
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@map("integration_states")
+}
 
 model User {
   id           String      @id @default(uuid())
@@ -112,10 +154,11 @@ model ChannelCredential {
 }
 
 model Order {
-  id              String      @id @default(uuid())
-  channel         ChannelType
-  externalOrderId String      @map("external_order_id")
-  status          OrderStatus @default(NEW)
+  id               String      @id @default(uuid())
+  channel          ChannelType
+  channelAccountId String?     @map("channel_account_id")
+  externalOrderId  String      @map("external_order_id")
+  status           OrderStatus @default(NEW)
 
   // Normalized buyer / shipping info
   buyerName       String      @map("buyer_name")
@@ -136,17 +179,19 @@ model Order {
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
 
-  items       OrderItem[]
-  shipment    Shipment?
-  batchOrders BatchOrder[]
-  documents   Document[]
-  exceptions  Exception[]
-  auditLogs   AuditLog[]
+  channelAccount ChannelAccount? @relation(fields: [channelAccountId], references: [id], onDelete: SetNull)
+  items          OrderItem[]
+  shipment       Shipment?
+  batchOrders    BatchOrder[]
+  documents      Document[]
+  exceptions     Exception[]
+  auditLogs      AuditLog[]
 
   @@unique([channel, externalOrderId])
   @@index([status])
   @@index([createdAt])
   @@index([channel])
+  @@index([channelAccountId])
   @@map("orders")
 }
 

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api, { ApiError } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
-import type { CreateBatchPayload, CaptureSerialPayload } from "@/types";
+import type { CreateBatchPayload, CaptureSerialPayload, TemuManualConnectPayload } from "@/types";
 
 // ── Dashboard ──
 
@@ -291,6 +291,76 @@ export function useCreateUser() {
     },
     onError: (err: ApiError) => {
       toast({ title: "Failed", description: err.message, variant: "destructive" });
+    },
+  });
+}
+
+// ── Integrations ──
+
+export function useChannelAccounts(channel: string) {
+  return useQuery({
+    queryKey: ["integrations", channel, "accounts"],
+    queryFn: () => api.integrations.accounts(channel),
+    enabled: !!channel,
+  });
+}
+
+export function useStartIntegration() {
+  return useMutation({
+    mutationFn: (channel: string) => api.integrations.start(channel),
+    onSuccess: (data) => {
+      // Redirect user to the marketplace OAuth page
+      window.location.href = data.authUrl;
+    },
+    onError: (err: ApiError) => {
+      toast({ title: "Connect Failed", description: err.message, variant: "destructive" });
+    },
+  });
+}
+
+export function useTestConnection() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ channel, accountId }: { channel: string; accountId: string }) =>
+      api.integrations.test(channel, accountId),
+    onSuccess: (data, variables) => {
+      toast({
+        title: data.ok ? "Connection OK" : "Connection Failed",
+        description: data.message,
+        variant: data.ok ? "default" : "destructive",
+      });
+      qc.invalidateQueries({ queryKey: ["integrations", variables.channel, "accounts"] });
+    },
+    onError: (err: ApiError) => {
+      toast({ title: "Test Failed", description: err.message, variant: "destructive" });
+    },
+  });
+}
+
+export function useDisconnectAccount() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (accountId: string) => api.integrations.disconnect(accountId),
+    onSuccess: () => {
+      toast({ title: "Account Disconnected" });
+      qc.invalidateQueries({ queryKey: ["integrations"] });
+    },
+    onError: (err: ApiError) => {
+      toast({ title: "Disconnect Failed", description: err.message, variant: "destructive" });
+    },
+  });
+}
+
+export function useTemuManualConnect() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: TemuManualConnectPayload) => api.integrations.temuManual(data),
+    onSuccess: () => {
+      toast({ title: "Temu Account Connected" });
+      qc.invalidateQueries({ queryKey: ["integrations", "temu", "accounts"] });
+    },
+    onError: (err: ApiError) => {
+      toast({ title: "Connect Failed", description: err.message, variant: "destructive" });
     },
   });
 }

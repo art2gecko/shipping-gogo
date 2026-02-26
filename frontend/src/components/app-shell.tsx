@@ -7,6 +7,7 @@ import {
   ScanBarcode,
   FileText,
   Settings,
+  Plug,
   LogOut,
   Menu,
   X,
@@ -27,6 +28,7 @@ const navigation = [
   { name: "Exceptions", href: "/exceptions", icon: AlertTriangle },
   { name: "Serial Capture", href: "/serial-capture", icon: ScanBarcode },
   { name: "Documents", href: "/documents", icon: FileText },
+  { name: "Integrations", href: "/settings/integrations", icon: Plug },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -76,7 +78,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               const active =
                 item.href === "/"
                   ? location.pathname === "/"
-                  : location.pathname.startsWith(item.href);
+                  : item.href === "/settings"
+                    ? location.pathname === "/settings"
+                    : location.pathname.startsWith(item.href);
               return (
                 <Link
                   key={item.href}

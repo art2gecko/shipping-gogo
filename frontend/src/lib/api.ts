@@ -13,6 +13,9 @@ import type {
   SerialCapture,
   Setting,
   User,
+  ChannelAccount,
+  TestConnectionResult,
+  TemuManualConnectPayload,
 } from "@/types";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "";
@@ -209,6 +212,29 @@ export const users = {
     }),
 };
 
+// ── Integrations ──
+
+export const integrations = {
+  accounts: (channel: string) =>
+    request<ChannelAccount[]>(`/api/integrations/${channel}/accounts`),
+  start: (channel: string) =>
+    request<{ authUrl: string; state: string }>(`/api/integrations/${channel}/start`),
+  test: (channel: string, accountId: string) =>
+    request<TestConnectionResult>(`/api/integrations/${channel}/test`, {
+      method: "POST",
+      body: JSON.stringify({ accountId }),
+    }),
+  disconnect: (accountId: string) =>
+    request<{ message: string }>(`/api/integrations/accounts/${accountId}`, {
+      method: "DELETE",
+    }),
+  temuManual: (data: TemuManualConnectPayload) =>
+    request<ChannelAccount>("/api/integrations/temu/manual", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+};
+
 export { ApiError };
 
 const api = {
@@ -222,6 +248,7 @@ const api = {
   auditLogs,
   settings,
   users,
+  integrations,
 };
 
 export default api;
