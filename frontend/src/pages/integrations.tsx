@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import {
   Loader2,
   Link2,
+  Plus,
   Unplug,
   TestTube2,
   Key,
@@ -48,21 +49,21 @@ const CHANNELS: ChannelDef[] = [
   {
     key: "amazon",
     name: "Amazon",
-    description: "Connect your Amazon Seller Central account via SP-API",
+    description: "Connect one or more Amazon Seller Central accounts via SP-API",
     color: "bg-orange-500",
     supportsManualToken: false,
   },
   {
     key: "ebay",
     name: "eBay",
-    description: "Connect your eBay seller account via OAuth",
+    description: "Connect one or more eBay seller accounts via OAuth",
     color: "bg-blue-600",
     supportsManualToken: false,
   },
   {
     key: "temu",
     name: "Temu",
-    description: "Connect your Temu seller account via OAuth or API token",
+    description: "Connect one or more Temu seller accounts via OAuth or API token",
     color: "bg-orange-600",
     supportsManualToken: true,
   },
@@ -171,6 +172,9 @@ function ChannelCard({ channel }: { channel: ChannelDef }) {
   const startIntegration = useStartIntegration();
   const [showTokenDialog, setShowTokenDialog] = React.useState(false);
 
+  const accountCount = accounts?.length ?? 0;
+  const hasAccounts = accountCount > 0;
+
   return (
     <Card>
       <CardHeader>
@@ -180,7 +184,14 @@ function ChannelCard({ channel }: { channel: ChannelDef }) {
               {channel.name[0]}
             </div>
             <div>
-              <CardTitle className="text-base">{channel.name}</CardTitle>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base">{channel.name}</CardTitle>
+                {hasAccounts && (
+                  <Badge variant="secondary" className="text-xs">
+                    {accountCount} {accountCount === 1 ? "store" : "stores"}
+                  </Badge>
+                )}
+              </div>
               <CardDescription>{channel.description}</CardDescription>
             </div>
           </div>
@@ -192,10 +203,12 @@ function ChannelCard({ channel }: { channel: ChannelDef }) {
             >
               {startIntegration.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
+              ) : hasAccounts ? (
+                <Plus className="h-4 w-4" />
               ) : (
                 <Link2 className="h-4 w-4" />
               )}
-              Connect
+              {hasAccounts ? "Add Store" : "Connect"}
             </Button>
             {channel.supportsManualToken && (
               <Button
@@ -204,7 +217,7 @@ function ChannelCard({ channel }: { channel: ChannelDef }) {
                 onClick={() => setShowTokenDialog(true)}
               >
                 <Key className="h-4 w-4" />
-                Connect via Token
+                {hasAccounts ? "Add via Token" : "Connect via Token"}
               </Button>
             )}
           </div>
@@ -215,9 +228,9 @@ function ChannelCard({ channel }: { channel: ChannelDef }) {
           <div className="space-y-2">
             <Skeleton className="h-16" />
           </div>
-        ) : !accounts || accounts.length === 0 ? (
+        ) : !hasAccounts ? (
           <p className="text-sm text-muted-foreground py-4 text-center">
-            No accounts connected. Click Connect to get started.
+            No stores connected. Click Connect to add your first store.
           </p>
         ) : (
           <div className="space-y-2">
