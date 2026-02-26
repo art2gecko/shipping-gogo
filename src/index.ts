@@ -1,4 +1,5 @@
 import express from "express";
+import authRouter from "./routes/auth";
 import documentsRouter from "./routes/documents";
 import labelsRouter from "./routes/labels";
 
@@ -10,6 +11,7 @@ app.use("/api/labels", express.raw({ type: ["application/pdf", "image/png"], lim
 app.use(express.json());
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
+app.use("/api/auth", authRouter);
 app.use("/api/documents", documentsRouter);
 app.use("/api/labels", labelsRouter);
 
