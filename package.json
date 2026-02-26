@@ -10,7 +10,10 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "setup": "npx prisma generate && npx prisma migrate deploy && npx prisma db seed",
+    "db:start": "docker compose up -d db",
+    "db:stop": "docker compose down"
   },
   "prisma": {
     "seed": "ts-node --transpile-only prisma/seed.ts"
