@@ -11,7 +11,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
     "prisma:studio": "prisma studio",
-    "setup": "npx prisma generate && npx prisma migrate deploy && npx prisma db seed",
+    "env:init": "test -f .env || cp .env.example .env",
+    "setup": "npm run env:init && npx prisma generate && npx prisma migrate deploy && npx prisma db seed",
     "db:start": "docker compose up -d db",
     "db:stop": "docker compose down"
   },

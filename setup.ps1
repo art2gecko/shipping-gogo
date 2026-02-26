@@ -23,16 +23,9 @@ if ($LASTEXITCODE -ne 0) { Write-Host "  npm install failed" -ForegroundColor Re
 
 # 3. Check for .env
 if (-not (Test-Path ".env")) {
-    Write-Host "`n[3/7] Creating .env file..." -ForegroundColor Yellow
-    @"
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/shipping_gogo?schema=public"
-PORT=3000
-NODE_ENV=development
-SHIPMENT_ROOT="./Shipments"
-ADMIN_PASSWORD="admin123"
-WAREHOUSE_PASSWORD="warehouse123"
-"@ | Out-File -Encoding utf8 ".env"
-    Write-Host "  .env created" -ForegroundColor Green
+    Write-Host "`n[3/7] Creating .env from .env.example..." -ForegroundColor Yellow
+    Copy-Item ".env.example" ".env"
+    Write-Host "  .env created (edit it if you need custom settings)" -ForegroundColor Green
 } else {
     Write-Host "`n[3/7] .env already exists" -ForegroundColor Green
 }
