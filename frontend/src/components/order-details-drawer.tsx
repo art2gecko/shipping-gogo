@@ -10,6 +10,8 @@ import {
   AlertTriangle,
   Loader2,
   ExternalLink,
+  Tag,
+  Truck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +36,7 @@ import {
   useUploadLabel,
   useHoldOrder,
   useReleaseHold,
+  useUploadTracking,
 } from "@/hooks/use-api";
 import { documents as docsApi } from "@/lib/api";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
@@ -54,6 +57,7 @@ export function OrderDetailsDrawer({
   const uploadLabel = useUploadLabel();
   const holdOrder = useHoldOrder();
   const releaseHold = useReleaseHold();
+  const uploadTracking = useUploadTracking();
 
   const [holdDialog, setHoldDialog] = React.useState(false);
   const [holdReason, setHoldReason] = React.useState("");
@@ -153,6 +157,18 @@ export function OrderDetailsDrawer({
                 <Upload className="h-3 w-3" />
                 Upload Label
               </Button>
+              {order.channelAccountId && order.shipment?.trackingNumber && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => uploadTracking.mutate({ orderId: order.id })}
+                  disabled={uploadTracking.isPending}
+                >
+                  {uploadTracking.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Truck className="h-3 w-3" />}
+                  Sync Tracking
+                </Button>
+              )}
               {order.status === "HOLD" ? (
                 <Button
                   variant="outline"

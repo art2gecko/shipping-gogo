@@ -235,6 +235,89 @@ export const integrations = {
     }),
 };
 
+// ── Marketplace (Label Purchase + Tracking Upload) ──
+
+export interface PurchaseLabelPayload {
+  shipFromAddress: {
+    name: string;
+    address1: string;
+    address2?: string;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+  };
+  packageDetails: {
+    weightOz: number;
+    lengthIn?: number;
+    widthIn?: number;
+    heightIn?: number;
+  };
+  carrierCode?: string;
+  serviceCode?: string;
+}
+
+export interface PurchaseLabelResult {
+  trackingNumber: string;
+  carrierCode: string;
+  cost?: number;
+  labelUrl?: string;
+  filePath?: string;
+}
+
+export interface UploadTrackingPayload {
+  trackingNumber?: string;
+  carrierCode?: string;
+  shipDate?: string;
+}
+
+export interface UploadTrackingResult {
+  ok: boolean;
+  message: string;
+  trackingNumber: string;
+  carrierCode: string;
+}
+
+export interface SyncResult {
+  message: string;
+  accounts?: Array<{
+    accountId: string;
+    channel: string;
+    imported: number;
+    skipped: number;
+    errors: number;
+  }>;
+  totalImported?: number;
+  totalErrors?: number;
+}
+
+export const marketplace = {
+  purchaseLabel: (orderId: string, data: PurchaseLabelPayload) =>
+    request<PurchaseLabelResult>(`/api/marketplace/orders/${orderId}/purchase-label`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  uploadTracking: (orderId: string, data?: UploadTrackingPayload) =>
+    request<UploadTrackingResult>(`/api/marketplace/orders/${orderId}/upload-tracking`, {
+      method: "POST",
+      body: JSON.stringify(data || {}),
+    }),
+  bulkUploadTracking: (orderIds: string[]) =>
+    request<{ message: string; results: Array<{ orderId: string; ok: boolean; message: string }> }>(
+      "/api/marketplace/orders/bulk-upload-tracking",
+      {
+        method: "POST",
+        body: JSON.stringify({ orderIds }),
+      },
+    ),
+};
+
+export const sync = {
+  orders: () => request<SyncResult>("/api/sync/orders", { method: "POST" }),
+  account: (accountId: string) =>
+    request<SyncResult>(`/api/sync/orders/${accountId}`, { method: "POST" }),
+};
+
 export { ApiError };
 
 const api = {
@@ -249,6 +332,8 @@ const api = {
   settings,
   users,
   integrations,
+  marketplace,
+  sync,
 };
 
 export default api;

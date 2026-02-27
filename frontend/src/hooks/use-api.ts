@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api, { ApiError } from "@/lib/api";
+import type { PurchaseLabelPayload, UploadTrackingPayload } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 import type { CreateBatchPayload, CaptureSerialPayload, TemuManualConnectPayload } from "@/types";
 
@@ -361,6 +362,77 @@ export function useTemuManualConnect() {
     },
     onError: (err: ApiError) => {
       toast({ title: "Connect Failed", description: err.message, variant: "destructive" });
+    },
+  });
+}
+
+// ── Marketplace (Label Purchase + Tracking Upload) ──
+
+export function usePurchaseLabel() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ orderId, data }: { orderId: string; data: PurchaseLabelPayload }) =>
+      api.marketplace.purchaseLabel(orderId, data),
+    onSuccess: (data) => {
+      toast({
+        title: "Label Purchased",
+        description: `Tracking: ${data.trackingNumber} via ${data.carrierCode}${data.cost ? ` ($${data.cost.toFixed(2)})` : ""}`,
+      });
+      qc.invalidateQueries({ queryKey: ["orders"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+    onError: (err: ApiError) => {
+      toast({ title: "Label Purchase Failed", description: err.message, variant: "destructive" });
+    },
+  });
+}
+
+export function useUploadTracking() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ orderId, data }: { orderId: string; data?: UploadTrackingPayload }) =>
+      api.marketplace.uploadTracking(orderId, data),
+    onSuccess: (data) => {
+      toast({
+        title: "Tracking Uploaded",
+        description: data.message,
+      });
+      qc.invalidateQueries({ queryKey: ["orders"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+    onError: (err: ApiError) => {
+      toast({ title: "Tracking Upload Failed", description: err.message, variant: "destructive" });
+    },
+  });
+}
+
+export function useBulkUploadTracking() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (orderIds: string[]) => api.marketplace.bulkUploadTracking(orderIds),
+    onSuccess: (data) => {
+      toast({ title: "Bulk Tracking Upload", description: data.message });
+      qc.invalidateQueries({ queryKey: ["orders"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+    },
+    onError: (err: ApiError) => {
+      toast({ title: "Bulk Tracking Failed", description: err.message, variant: "destructive" });
+    },
+  });
+}
+
+export function useSyncAccountOrders() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (accountId: string) => api.sync.account(accountId),
+    onSuccess: (data) => {
+      toast({ title: "Account Sync", description: data.message });
+      qc.invalidateQueries({ queryKey: ["orders"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+      qc.invalidateQueries({ queryKey: ["integrations"] });
+    },
+    onError: (err: ApiError) => {
+      toast({ title: "Sync Failed", description: err.message, variant: "destructive" });
     },
   });
 }

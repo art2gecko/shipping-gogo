@@ -10,6 +10,8 @@ import {
   CheckCircle,
   AlertTriangle,
   Loader2,
+  Tag,
+  Truck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,7 +32,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { OrderStatusBadge, ShipmentStatusBadge } from "@/components/status-badge";
 import { ChannelBadge } from "@/components/channel-badge";
 import { PageSkeleton } from "@/components/loading";
-import { useOrder, useGeneratePackingSlip, useUploadLabel, useHoldOrder, useReleaseHold } from "@/hooks/use-api";
+import { useOrder, useGeneratePackingSlip, useUploadLabel, useHoldOrder, useReleaseHold, usePurchaseLabel, useUploadTracking } from "@/hooks/use-api";
 import { documents as docsApi } from "@/lib/api";
 import { formatDate, formatDateTime } from "@/lib/utils";
 
@@ -41,11 +43,31 @@ export default function OrderDetailPage() {
   const uploadLabel = useUploadLabel();
   const holdOrder = useHoldOrder();
   const releaseHold = useReleaseHold();
+  const purchaseLabel = usePurchaseLabel();
+  const uploadTracking = useUploadTracking();
 
   const [holdDialog, setHoldDialog] = React.useState(false);
   const [holdReason, setHoldReason] = React.useState("");
   const [uploadDialog, setUploadDialog] = React.useState(false);
   const [uploadFile, setUploadFile] = React.useState<File | null>(null);
+  const [buyLabelDialog, setBuyLabelDialog] = React.useState(false);
+  const [trackingDialog, setTrackingDialog] = React.useState(false);
+
+  // Buy Label form state
+  const [labelWeight, setLabelWeight] = React.useState("16");
+  const [labelLength, setLabelLength] = React.useState("");
+  const [labelWidth, setLabelWidth] = React.useState("");
+  const [labelHeight, setLabelHeight] = React.useState("");
+  const [labelCarrier, setLabelCarrier] = React.useState("");
+  const [shipFromName, setShipFromName] = React.useState("");
+  const [shipFromAddr, setShipFromAddr] = React.useState("");
+  const [shipFromCity, setShipFromCity] = React.useState("");
+  const [shipFromState, setShipFromState] = React.useState("");
+  const [shipFromZip, setShipFromZip] = React.useState("");
+
+  // Tracking form state
+  const [trackingNum, setTrackingNum] = React.useState("");
+  const [trackingCarrier, setTrackingCarrier] = React.useState("");
 
   if (isLoading) return <PageSkeleton />;
   if (!order) {
@@ -96,9 +118,25 @@ export default function OrderDetailPage() {
             {generateSlip.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
             Packing Slip
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => setBuyLabelDialog(true)}
+            disabled={!order.channelAccountId || order.status === "SHIPPED" || order.status === "CANCELED"}
+          >
+            <Tag className="h-4 w-4" />
+            Buy Label
+          </Button>
           <Button variant="outline" onClick={() => setUploadDialog(true)}>
             <Upload className="h-4 w-4" />
             Upload Label
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setTrackingDialog(true)}
+            disabled={!order.channelAccountId || order.status === "CANCELED"}
+          >
+            <Truck className="h-4 w-4" />
+            Upload Tracking
           </Button>
           {order.status === "HOLD" ? (
             <Button variant="success" onClick={() => releaseHold.mutate(order.id)}>
@@ -391,6 +429,173 @@ export default function OrderDetailPage() {
               }}
             >
               Upload
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Buy Label via Marketplace Dialog */}
+      <Dialog open={buyLabelDialog} onOpenChange={() => setBuyLabelDialog(false)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Buy Shipping Label</DialogTitle>
+            <DialogDescription>Purchase a label through {order.channel} marketplace.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 max-h-[60vh] overflow-auto pr-1">
+            <div className="rounded-md border bg-muted/30 p-3">
+              <p className="text-xs font-medium text-muted-foreground mb-1">Ship To</p>
+              <p className="text-sm font-medium">{order.shipToName}</p>
+              <p className="text-xs text-muted-foreground">
+                {order.shipToAddress1}, {order.shipToCity}, {order.shipToState} {order.shipToZip}
+              </p>
+            </div>
+
+            <Separator />
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-2">Ship From</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2 space-y-1">
+                  <Label className="text-xs">Name</Label>
+                  <Input value={shipFromName} onChange={(e) => setShipFromName(e.target.value)} placeholder="Warehouse Name" className="h-8 text-sm" />
+                </div>
+                <div className="col-span-2 space-y-1">
+                  <Label className="text-xs">Address</Label>
+                  <Input value={shipFromAddr} onChange={(e) => setShipFromAddr(e.target.value)} placeholder="123 Main St" className="h-8 text-sm" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">City</Label>
+                  <Input value={shipFromCity} onChange={(e) => setShipFromCity(e.target.value)} className="h-8 text-sm" />
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1 space-y-1">
+                    <Label className="text-xs">State</Label>
+                    <Input value={shipFromState} onChange={(e) => setShipFromState(e.target.value)} className="h-8 text-sm" maxLength={2} />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <Label className="text-xs">ZIP</Label>
+                    <Input value={shipFromZip} onChange={(e) => setShipFromZip(e.target.value)} className="h-8 text-sm" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-2">Package Details</p>
+              <div className="grid grid-cols-4 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Weight (oz)</Label>
+                  <Input value={labelWeight} onChange={(e) => setLabelWeight(e.target.value)} type="number" className="h-8 text-sm" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Length</Label>
+                  <Input value={labelLength} onChange={(e) => setLabelLength(e.target.value)} type="number" placeholder="in" className="h-8 text-sm" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Width</Label>
+                  <Input value={labelWidth} onChange={(e) => setLabelWidth(e.target.value)} type="number" placeholder="in" className="h-8 text-sm" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Height</Label>
+                  <Input value={labelHeight} onChange={(e) => setLabelHeight(e.target.value)} type="number" placeholder="in" className="h-8 text-sm" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs">Carrier Preference (optional)</Label>
+              <Input value={labelCarrier} onChange={(e) => setLabelCarrier(e.target.value)} placeholder="e.g., USPS, UPS, FedEx" className="h-8 text-sm" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBuyLabelDialog(false)}>Cancel</Button>
+            <Button
+              disabled={!shipFromName || !shipFromAddr || !shipFromCity || !shipFromState || !shipFromZip || !labelWeight || purchaseLabel.isPending}
+              onClick={() => {
+                purchaseLabel.mutate({
+                  orderId: order.id,
+                  data: {
+                    shipFromAddress: {
+                      name: shipFromName,
+                      address1: shipFromAddr,
+                      city: shipFromCity,
+                      state: shipFromState,
+                      zip: shipFromZip,
+                      country: "US",
+                    },
+                    packageDetails: {
+                      weightOz: parseFloat(labelWeight),
+                      lengthIn: labelLength ? parseFloat(labelLength) : undefined,
+                      widthIn: labelWidth ? parseFloat(labelWidth) : undefined,
+                      heightIn: labelHeight ? parseFloat(labelHeight) : undefined,
+                    },
+                    carrierCode: labelCarrier || undefined,
+                  },
+                });
+                setBuyLabelDialog(false);
+              }}
+            >
+              {purchaseLabel.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Tag className="h-4 w-4" />}
+              Purchase Label
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Upload Tracking to Marketplace Dialog */}
+      <Dialog open={trackingDialog} onOpenChange={() => setTrackingDialog(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Upload Tracking to {order.channel}</DialogTitle>
+            <DialogDescription>
+              Confirm shipment by uploading tracking info to the marketplace.
+              {order.shipment?.trackingNumber && (
+                <span className="block mt-1 text-foreground">
+                  Current tracking: <span className="font-mono">{order.shipment.trackingNumber}</span>
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Tracking Number</Label>
+              <Input
+                value={trackingNum || order.shipment?.trackingNumber || ""}
+                onChange={(e) => setTrackingNum(e.target.value)}
+                placeholder="Enter tracking number"
+                className="font-mono"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Carrier Code</Label>
+              <Input
+                value={trackingCarrier || order.shipment?.carrierCode || ""}
+                onChange={(e) => setTrackingCarrier(e.target.value)}
+                placeholder="e.g., USPS, UPS, FedEx"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTrackingDialog(false)}>Cancel</Button>
+            <Button
+              disabled={uploadTracking.isPending}
+              onClick={() => {
+                uploadTracking.mutate({
+                  orderId: order.id,
+                  data: {
+                    trackingNumber: trackingNum || undefined,
+                    carrierCode: trackingCarrier || undefined,
+                  },
+                });
+                setTrackingDialog(false);
+                setTrackingNum("");
+                setTrackingCarrier("");
+              }}
+            >
+              {uploadTracking.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
+              Upload Tracking
             </Button>
           </DialogFooter>
         </DialogContent>

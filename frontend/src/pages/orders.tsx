@@ -1,7 +1,8 @@
 import * as React from "react";
 import { useSearchParams } from "react-router-dom";
-import { Package, Layers } from "lucide-react";
+import { Package, Layers, Truck, Loader2, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -11,12 +12,12 @@ import {
 } from "@/components/ui/select";
 import { CommandBar } from "@/components/command-bar";
 import { DataTable, type Column } from "@/components/data-table";
-import { OrderStatusBadge } from "@/components/status-badge";
+import { OrderStatusBadge, ShipmentStatusBadge } from "@/components/status-badge";
 import { ChannelBadge } from "@/components/channel-badge";
 import { TableSkeleton } from "@/components/loading";
 import { EmptyState } from "@/components/empty-state";
 import { OrderDetailsDrawer } from "@/components/order-details-drawer";
-import { useOrders, useCreateBatch } from "@/hooks/use-api";
+import { useOrders, useCreateBatch, useBulkUploadTracking } from "@/hooks/use-api";
 import { formatDate } from "@/lib/utils";
 import type { Order, ChannelType, OrderStatus } from "@/types";
 
@@ -53,6 +54,7 @@ export default function OrdersPage() {
     Object.keys(params).length ? params : undefined,
   );
   const createBatch = useCreateBatch();
+  const bulkTracking = useBulkUploadTracking();
 
   // Client-side filtering
   const filtered = React.useMemo(() => {
@@ -173,6 +175,25 @@ export default function OrdersPage() {
         ),
       },
       {
+        key: "shipment",
+        header: "Shipment",
+        render: (o) => {
+          if (!o.shipment) {
+            return <span className="text-xs text-muted-foreground">--</span>;
+          }
+          return (
+            <div className="min-w-0">
+              <ShipmentStatusBadge status={o.shipment.status} />
+              {o.shipment.trackingNumber && (
+                <p className="text-[10px] font-mono text-muted-foreground mt-0.5 truncate max-w-[120px]">
+                  {o.shipment.trackingNumber}
+                </p>
+              )}
+            </div>
+          );
+        },
+      },
+      {
         key: "date",
         header: "Date",
         sortable: true,
@@ -196,19 +217,34 @@ export default function OrdersPage() {
         filterChips={filterChips}
         selectedCount={selectedKeys.size}
         bulkActions={
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-xs"
-            onClick={() => {
-              createBatch.mutate({ orderIds: Array.from(selectedKeys) });
-              setSelectedKeys(new Set());
-            }}
-            disabled={createBatch.isPending}
-          >
-            <Layers className="h-3 w-3" />
-            Create Batch
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => {
+                createBatch.mutate({ orderIds: Array.from(selectedKeys) });
+                setSelectedKeys(new Set());
+              }}
+              disabled={createBatch.isPending}
+            >
+              {createBatch.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Layers className="h-3 w-3" />}
+              Create Batch
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => {
+                bulkTracking.mutate(Array.from(selectedKeys));
+                setSelectedKeys(new Set());
+              }}
+              disabled={bulkTracking.isPending}
+            >
+              {bulkTracking.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Truck className="h-3 w-3" />}
+              Upload Tracking
+            </Button>
+          </>
         }
         filters={
           <>
