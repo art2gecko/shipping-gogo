@@ -97,9 +97,17 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-call npx prisma db seed --no-hints
+echo Seeding database...
+call npx ts-node --transpile-only prisma/seed.ts
 if errorlevel 1 (
-    echo WARNING: Seed may have already run, continuing...
+    echo.
+    echo WARNING: Seed failed. Retrying...
+    call npx ts-node --transpile-only prisma/seed.ts
+    if errorlevel 1 (
+        echo ERROR: Database seed failed. Check the error above.
+        pause
+        exit /b 1
+    )
 )
 
 echo.
@@ -116,7 +124,7 @@ echo ============================================
 echo.
 
 REM Start backend in a separate window
-start "ShipGo Backend" cmd /c "npx ts-node src/index.ts"
+start "ShipGo Backend" cmd /k "set DATABASE_URL=postgresql://postgres:postgres@localhost:5432/shipping_gogo?schema=public && npx ts-node src/index.ts"
 timeout /t 2 /nobreak >nul
 
 REM Open browser
