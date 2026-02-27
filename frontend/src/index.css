@@ -22,7 +22,7 @@
   --secondary-foreground: #0f172a;
   --muted: #f1f5f9;              /* slate-100 */
   --muted-foreground: #64748b;   /* slate-500 */
-  --accent: #f1f5f9;
+  --accent: #e8ecf4;             /* slate-150 — distinct from secondary */
   --accent-foreground: #0f172a;
   --destructive: #dc2626;        /* red-600 */
   --destructive-foreground: #ffffff;
@@ -49,9 +49,9 @@
   /* ── Order status ── */
   --status-new: #6b7280;         /* gray-500 */
   --status-new-foreground: #ffffff;
-  --status-ready: #2563eb;       /* blue-600 */
+  --status-ready: #0891b2;       /* cyan-600 — teal, distinct from blue primary */
   --status-ready-foreground: #ffffff;
-  --status-shipped: #16a34a;     /* green-600 */
+  --status-shipped: #16a34a;     /* green-600 — green = terminal done */
   --status-shipped-foreground: #ffffff;
   --status-hold: #d97706;        /* amber-600 */
   --status-hold-foreground: #451a03;
@@ -61,19 +61,19 @@
   --status-canceled-foreground: #ffffff;
   --status-pending: #9ca3af;     /* gray-400 */
   --status-pending-foreground: #1f2937;
-  --status-label-purchased: #7c3aed;  /* violet-600 */
+  --status-label-purchased: #7c3aed;  /* violet-600 — purple intermediate */
   --status-label-purchased-foreground: #ffffff;
-  --status-packed: #0891b2;      /* cyan-600 */
+  --status-packed: #0e7490;      /* cyan-700 — darker teal, distinct from Ready */
   --status-packed-foreground: #ffffff;
 
   /* ── Channel brands ── */
-  --channel-amazon: #ff9900;
+  --channel-amazon: #ff9900;     /* orange — Amazon brand */
   --channel-amazon-foreground: #1a1a1a;
-  --channel-ebay: #0064d2;
+  --channel-ebay: #0ea5e9;       /* sky-500 — teal-cyan, distinct from Walmart blue */
   --channel-ebay-foreground: #ffffff;
-  --channel-walmart: #0071ce;
+  --channel-walmart: #2563eb;    /* blue-600 — deep blue, distinct from eBay */
   --channel-walmart-foreground: #ffffff;
-  --channel-temu: #f55f1f;
+  --channel-temu: #db2777;       /* pink-600 — magenta, distinct from Amazon orange */
   --channel-temu-foreground: #ffffff;
 
   /* ── Audit feed icon colors ── */
@@ -90,11 +90,11 @@
   /* ── Dashboard KPI ── */
   --kpi-unshipped: #6b7280;
   --kpi-unshipped-bg: #f3f4f6;
-  --kpi-ready: #2563eb;
-  --kpi-ready-bg: #eff6ff;
+  --kpi-ready: #0891b2;          /* cyan-600 — matches status-ready */
+  --kpi-ready-bg: #ecfeff;       /* cyan-50 */
   --kpi-labels: #7c3aed;
   --kpi-labels-bg: #f5f3ff;
-  --kpi-batches: #0891b2;
+  --kpi-batches: #0e7490;        /* cyan-700 */
   --kpi-batches-bg: #ecfeff;
 
   --sidebar-width: 14rem;
@@ -114,7 +114,7 @@
   --secondary-foreground: #f8fafc;
   --muted: #1e293b;
   --muted-foreground: #94a3b8;   /* slate-400 */
-  --accent: #1e293b;
+  --accent: #243346;             /* slate-750 — distinct from secondary */
   --accent-foreground: #f8fafc;
   --destructive: #ef4444;        /* red-500 */
   --destructive-foreground: #ffffff;
@@ -137,7 +137,7 @@
 
   --status-new: #9ca3af;
   --status-new-foreground: #1f2937;
-  --status-ready: #3b82f6;
+  --status-ready: #06b6d4;       /* cyan-500 */
   --status-ready-foreground: #ffffff;
   --status-shipped: #22c55e;
   --status-shipped-foreground: #052e16;
@@ -151,23 +151,23 @@
   --status-pending-foreground: #f3f4f6;
   --status-label-purchased: #8b5cf6;
   --status-label-purchased-foreground: #ffffff;
-  --status-packed: #06b6d4;
+  --status-packed: #0891b2;      /* cyan-600 */
   --status-packed-foreground: #ffffff;
 
-  --channel-amazon: #fbbf24;
+  --channel-amazon: #fbbf24;     /* amber-400 */
   --channel-amazon-foreground: #1a1a1a;
-  --channel-ebay: #60a5fa;
+  --channel-ebay: #38bdf8;       /* sky-400 */
   --channel-ebay-foreground: #ffffff;
-  --channel-walmart: #60a5fa;
+  --channel-walmart: #60a5fa;    /* blue-400 */
   --channel-walmart-foreground: #ffffff;
-  --channel-temu: #fb923c;
+  --channel-temu: #f472b6;       /* pink-400 */
   --channel-temu-foreground: #ffffff;
 
   --audit-import: #9ca3af;
   --audit-batch: #8b5cf6;
   --audit-label: #8b5cf6;
   --audit-serial: #22c55e;
-  --audit-tracking: #06b6d4;
+  --audit-tracking: #22d3ee;     /* cyan-400 */
   --audit-exception: #ef4444;
   --audit-resolved: #22c55e;
   --audit-neutral: #6b7280;
@@ -175,11 +175,11 @@
 
   --kpi-unshipped: #9ca3af;
   --kpi-unshipped-bg: #1e293b;
-  --kpi-ready: #3b82f6;
-  --kpi-ready-bg: #1e3a5f;
+  --kpi-ready: #06b6d4;          /* cyan-500 */
+  --kpi-ready-bg: #164e63;       /* cyan-900 */
   --kpi-labels: #8b5cf6;
   --kpi-labels-bg: #2e1065;
-  --kpi-batches: #06b6d4;
+  --kpi-batches: #0891b2;        /* cyan-600 */
   --kpi-batches-bg: #164e63;
 }
 
