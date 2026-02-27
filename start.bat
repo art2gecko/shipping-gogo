@@ -75,6 +75,9 @@ if errorlevel 1 (
     timeout /t 3 /nobreak >nul
 )
 
+REM Set DATABASE_URL explicitly so Prisma always finds it
+set "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/shipping_gogo?schema=public"
+
 echo [4/5] Running database setup (migrations + seed)...
 call npx prisma generate --no-hints
 if errorlevel 1 (
@@ -82,7 +85,7 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-call npx prisma db push --accept-data-loss --skip-generate
+call npx prisma db push --accept-data-loss
 if errorlevel 1 (
     echo ERROR: Database schema push failed
     pause
