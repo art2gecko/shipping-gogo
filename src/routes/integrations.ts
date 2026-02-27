@@ -197,6 +197,21 @@ router.get("/:channel/start", async (req, res) => {
     // Load saved credentials from DB into process.env
     await loadChannelCredentials(channel);
 
+    // Verify required credentials are present before starting OAuth
+    const fields = CHANNEL_CREDENTIAL_FIELDS[channel];
+    const missing: string[] = [];
+    for (const field of fields) {
+      if (!process.env[field.envKey] && !field.defaultValue) {
+        missing.push(field.label);
+      }
+    }
+    if (missing.length > 0) {
+      res.status(400).json({
+        error: `Missing credentials: ${missing.join(", ")}. Go to Setup to enter them.`,
+      });
+      return;
+    }
+
     const provider = getProvider(channel);
 
     // Generate CSRF state nonce and store in DB

@@ -218,13 +218,7 @@ function ChannelCard({ channel }: { channel: ChannelDef }) {
             <Button
               size="sm"
               disabled={startIntegration.isPending}
-              onClick={() => {
-                if (!allConfigured) {
-                  setShowCredentialsDialog(true);
-                  return;
-                }
-                startIntegration.mutate(channel.key);
-              }}
+              onClick={() => startIntegration.mutate(channel.key)}
             >
               {startIntegration.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
