@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 import authRouter from "./routes/auth";
 import dashboardRouter from "./routes/dashboard";
 import ordersRouter from "./routes/orders";
@@ -18,6 +19,12 @@ import marketplaceRouter from "./routes/marketplace";
 
 const app = express();
 const PORT = parseInt(process.env.PORT ?? "3000", 10);
+
+// CORS – allow the frontend origin (Vercel) to call this API
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  credentials: true,
+}));
 
 // Raw body parsing for label uploads (binary PDF/PNG)
 app.use("/api/labels", express.raw({ type: ["application/pdf", "image/png"], limit: "10mb" }));

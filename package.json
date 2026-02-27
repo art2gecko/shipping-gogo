@@ -4,7 +4,8 @@
   "description": "Fulfillment Orchestrator – multi-marketplace order normalization, label purchasing, batching, and document generation",
   "private": true,
   "scripts": {
-    "build": "tsc",
+    "build": "prisma generate && tsc",
+    "postinstall": "prisma generate",
     "dev": "npx ts-node src/index.ts",
     "start": "node dist/index.js",
     "prisma:generate": "prisma generate",
@@ -29,6 +30,7 @@
     "@types/node": "^25.3.1",
     "@types/uuid": "^10.0.0",
     "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
     "csv-stringify": "^6.6.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
@@ -42,6 +44,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.10"
   }
 }
