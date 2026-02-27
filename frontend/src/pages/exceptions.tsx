@@ -119,7 +119,7 @@ export default function ExceptionsPage() {
               <CardContent className="flex items-start gap-4 p-4">
                 <div className="mt-0.5 shrink-0">
                   {exc.resolved ? (
-                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <CheckCircle className="h-5 w-5 text-success" />
                   ) : (
                     <AlertTriangle className="h-5 w-5 text-destructive" />
                   )}

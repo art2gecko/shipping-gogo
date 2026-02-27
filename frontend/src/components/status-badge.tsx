@@ -6,22 +6,22 @@ const orderStatusConfig: Record<
   OrderStatus,
   { label: string; variant: "default" | "secondary" | "destructive" | "success" | "warning" | "outline"; dotColor: string }
 > = {
-  NEW: { label: "New", variant: "secondary", dotColor: "bg-blue-500" },
-  READY: { label: "Ready", variant: "success", dotColor: "bg-green-500" },
-  HOLD: { label: "Hold", variant: "warning", dotColor: "bg-amber-500" },
-  SHIPPED: { label: "Shipped", variant: "default", dotColor: "bg-primary" },
-  CANCELED: { label: "Canceled", variant: "outline", dotColor: "bg-gray-400" },
+  NEW: { label: "New", variant: "secondary", dotColor: "bg-status-new" },
+  READY: { label: "Ready", variant: "success", dotColor: "bg-status-ready" },
+  HOLD: { label: "Hold", variant: "warning", dotColor: "bg-status-hold" },
+  SHIPPED: { label: "Shipped", variant: "default", dotColor: "bg-status-shipped" },
+  CANCELED: { label: "Canceled", variant: "outline", dotColor: "bg-status-canceled" },
 };
 
 const shipmentStatusConfig: Record<
   ShipmentStatus,
   { label: string; variant: "default" | "secondary" | "destructive" | "success" | "warning" | "outline"; dotColor: string }
 > = {
-  PENDING: { label: "Pending", variant: "secondary", dotColor: "bg-gray-400" },
-  LABEL_PURCHASED: { label: "Label Purchased", variant: "default", dotColor: "bg-blue-500" },
-  PACKED: { label: "Packed", variant: "success", dotColor: "bg-green-500" },
-  SHIPPED: { label: "Shipped", variant: "success", dotColor: "bg-green-500" },
-  ERROR: { label: "Error", variant: "destructive", dotColor: "bg-red-500" },
+  PENDING: { label: "Pending", variant: "secondary", dotColor: "bg-status-pending" },
+  LABEL_PURCHASED: { label: "Label Purchased", variant: "default", dotColor: "bg-status-label-purchased" },
+  PACKED: { label: "Packed", variant: "success", dotColor: "bg-status-packed" },
+  SHIPPED: { label: "Shipped", variant: "success", dotColor: "bg-status-shipped" },
+  ERROR: { label: "Error", variant: "destructive", dotColor: "bg-status-error" },
 };
 
 const exceptionTypeLabels: Record<ExceptionType, string> = {
@@ -44,7 +44,7 @@ export function OrderStatusBadge({
   const config = orderStatusConfig[status] || {
     label: status,
     variant: "outline" as const,
-    dotColor: "bg-gray-400",
+    dotColor: "bg-status-canceled",
   };
 
   if (dot) {
@@ -69,7 +69,7 @@ export function ShipmentStatusBadge({
   const config = shipmentStatusConfig[status] || {
     label: status,
     variant: "outline" as const,
-    dotColor: "bg-gray-400",
+    dotColor: "bg-status-canceled",
   };
 
   if (dot) {

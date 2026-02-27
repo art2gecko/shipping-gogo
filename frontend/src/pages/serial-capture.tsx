@@ -188,10 +188,10 @@ export default function SerialCapturePage() {
 
           {/* Scan input */}
           {allDone ? (
-            <Card className="border-green-500/50">
+            <Card className="border-success/30">
               <CardContent className="flex flex-col items-center gap-4 p-8">
-                <CheckCircle className="h-16 w-16 text-green-600" />
-                <h2 className="text-2xl font-bold text-green-700 dark:text-green-400">
+                <CheckCircle className="h-16 w-16 text-success" />
+                <h2 className="text-2xl font-bold text-success">
                   All Serials Captured!
                 </h2>
                 <p className="text-muted-foreground">
@@ -269,14 +269,14 @@ export default function SerialCapturePage() {
                   className={cn(
                     "transition-colors",
                     isCurrent && "ring-2 ring-primary",
-                    done && "border-green-500/50",
+                    done && "border-success/30",
                   )}
                 >
                   <CardContent className="p-4 space-y-2">
                     <div className="flex items-center justify-between">
                       <p className="font-mono font-bold">{item.sku}</p>
                       {done ? (
-                        <CheckCircle className="h-5 w-5 text-green-600" />
+                        <CheckCircle className="h-5 w-5 text-success" />
                       ) : isCurrent ? (
                         <ScanBarcode className="h-5 w-5 text-primary animate-pulse" />
                       ) : null}

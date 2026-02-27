@@ -173,7 +173,7 @@ export function OrderDetailsDrawer({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 text-xs text-green-600 border-green-200 hover:bg-green-50"
+                  className="h-7 text-xs text-success border-success/30 hover:bg-success/10"
                   onClick={() => releaseHold.mutate(order.id)}
                 >
                   <Play className="h-3 w-3" />
@@ -204,7 +204,7 @@ export function OrderDetailsDrawer({
               <div className="p-5 space-y-5">
                 {/* Hold warning */}
                 {order.holdReason && (
-                  <div className="flex items-start gap-2.5 rounded-md border border-warning/30 bg-warning/5 p-3">
+                  <div className="flex items-start gap-2.5 rounded-md border border-warning/30 bg-warning/10 p-3">
                     <PauseCircle className="h-4 w-4 text-warning mt-0.5 shrink-0" />
                     <div>
                       <p className="text-xs font-medium text-warning">
@@ -316,7 +316,7 @@ export function OrderDetailsDrawer({
                           className="h-1.5"
                         />
                         {capturedSerials === totalSerials && (
-                          <div className="flex items-center gap-1.5 text-xs text-green-600">
+                          <div className="flex items-center gap-1.5 text-xs text-success">
                             <CheckCircle className="h-3.5 w-3.5" />
                             All serials captured
                           </div>

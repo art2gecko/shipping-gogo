@@ -222,7 +222,7 @@ export default function OrderDetailPage() {
                 </div>
                 <Progress value={(capturedSerials / totalSerials) * 100} />
                 {capturedSerials === totalSerials && (
-                  <div className="flex items-center gap-2 text-sm text-green-600">
+                  <div className="flex items-center gap-2 text-sm text-success">
                     <CheckCircle className="h-4 w-4" />
                     All serials captured
                   </div>
@@ -362,11 +362,11 @@ export default function OrderDetailPage() {
       </div>
 
       {order.holdReason && (
-        <Card className="border-yellow-500/50">
+        <Card className="border-status-hold/30">
           <CardContent className="flex items-center gap-3 p-4">
-            <PauseCircle className="h-5 w-5 text-yellow-600" />
+            <PauseCircle className="h-5 w-5 text-status-hold" />
             <div>
-              <p className="font-medium text-yellow-700 dark:text-yellow-400">Order on Hold</p>
+              <p className="font-medium text-status-hold">Order on Hold</p>
               <p className="text-sm text-muted-foreground">{order.holdReason}</p>
             </div>
           </CardContent>

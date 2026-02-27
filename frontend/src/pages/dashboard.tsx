@@ -65,20 +65,20 @@ const auditActionIcons: Record<AuditAction, typeof Package> = {
 };
 
 const auditActionColors: Record<AuditAction, string> = {
-  ORDER_IMPORTED: "text-blue-500",
-  ORDER_UPDATED: "text-blue-500",
-  BATCH_CREATED: "text-indigo-500",
-  LABEL_PURCHASED: "text-purple-500",
-  LABEL_REPRINTED: "text-purple-500",
-  SERIAL_SCANNED: "text-green-500",
-  DOCUMENT_CREATED: "text-muted-foreground",
-  TRACKING_UPLOADED: "text-green-600",
-  EXCEPTION_CREATED: "text-red-500",
-  EXCEPTION_RESOLVED: "text-green-500",
-  SETTINGS_UPDATED: "text-muted-foreground",
-  INTEGRATION_CONNECT: "text-blue-500",
-  INTEGRATION_TEST: "text-blue-500",
-  INTEGRATION_DISCONNECT: "text-muted-foreground",
+  ORDER_IMPORTED: "text-audit-import",
+  ORDER_UPDATED: "text-audit-import",
+  BATCH_CREATED: "text-audit-batch",
+  LABEL_PURCHASED: "text-audit-label",
+  LABEL_REPRINTED: "text-audit-label",
+  SERIAL_SCANNED: "text-audit-serial",
+  DOCUMENT_CREATED: "text-audit-neutral",
+  TRACKING_UPLOADED: "text-audit-tracking",
+  EXCEPTION_CREATED: "text-audit-exception",
+  EXCEPTION_RESOLVED: "text-audit-resolved",
+  SETTINGS_UPDATED: "text-audit-neutral",
+  INTEGRATION_CONNECT: "text-audit-integration",
+  INTEGRATION_TEST: "text-audit-integration",
+  INTEGRATION_DISCONNECT: "text-audit-neutral",
 };
 
 export default function DashboardPage() {
@@ -162,7 +162,7 @@ export default function DashboardPage() {
                 <PipelineStage
                   label="Unshipped"
                   count={unshipped}
-                  color="bg-blue-500"
+                  color="bg-status-new"
                   total={total}
                   onClick={() => navigate("/orders?status=NEW")}
                 />
@@ -170,7 +170,7 @@ export default function DashboardPage() {
                 <PipelineStage
                   label="Ready"
                   count={ready}
-                  color="bg-green-500"
+                  color="bg-status-ready"
                   total={total}
                   onClick={() => navigate("/orders?status=READY")}
                 />
@@ -178,7 +178,7 @@ export default function DashboardPage() {
                 <PipelineStage
                   label="On Hold"
                   count={onHold}
-                  color="bg-amber-500"
+                  color="bg-status-hold"
                   total={total}
                   onClick={() => navigate("/orders?status=HOLD")}
                 />
@@ -186,7 +186,7 @@ export default function DashboardPage() {
                 <PipelineStage
                   label="Exceptions"
                   count={exceptions}
-                  color="bg-red-500"
+                  color="bg-status-error"
                   total={total}
                   onClick={() => navigate("/exceptions")}
                   isAlert={exceptions > 0}
@@ -203,15 +203,15 @@ export default function DashboardPage() {
                   {total > 0 && (
                     <>
                       <div
-                        className="bg-green-500 transition-all duration-500"
+                        className="bg-status-ready transition-all duration-500"
                         style={{ width: `${(ready / total) * 100}%` }}
                       />
                       <div
-                        className="bg-blue-500 transition-all duration-500"
+                        className="bg-status-new transition-all duration-500"
                         style={{ width: `${(unshipped / total) * 100}%` }}
                       />
                       <div
-                        className="bg-amber-500 transition-all duration-500"
+                        className="bg-status-hold transition-all duration-500"
                         style={{ width: `${(onHold / total) * 100}%` }}
                       />
                     </>
@@ -229,8 +229,8 @@ export default function DashboardPage() {
           label="Unshipped Orders"
           value={unshipped}
           icon={Package}
-          color="text-blue-600"
-          bgColor="bg-blue-500/10"
+          color="text-kpi-unshipped"
+          bgColor="bg-kpi-unshipped-bg"
           loading={stats.isLoading}
           onClick={() => navigate("/orders?status=NEW")}
         />
@@ -238,8 +238,8 @@ export default function DashboardPage() {
           label="Ready to Ship"
           value={ready}
           icon={CheckCircle}
-          color="text-green-600"
-          bgColor="bg-green-500/10"
+          color="text-kpi-ready"
+          bgColor="bg-kpi-ready-bg"
           loading={stats.isLoading}
           onClick={() => navigate("/orders?status=READY")}
         />
@@ -247,16 +247,16 @@ export default function DashboardPage() {
           label="Labels Today"
           value={labelsToday}
           icon={Tag}
-          color="text-purple-600"
-          bgColor="bg-purple-500/10"
+          color="text-kpi-labels"
+          bgColor="bg-kpi-labels-bg"
           loading={stats.isLoading}
         />
         <KPICard
           label="Batches Today"
           value={batchesToday}
           icon={Layers}
-          color="text-indigo-600"
-          bgColor="bg-indigo-500/10"
+          color="text-kpi-batches"
+          bgColor="bg-kpi-batches-bg"
           loading={stats.isLoading}
           onClick={() => navigate("/batches")}
         />
@@ -304,7 +304,7 @@ export default function DashboardPage() {
 
           {/* Alert Card for exceptions */}
           {exceptions > 0 && (
-            <Card className="border-destructive/30 bg-destructive/5">
+            <Card className="border-destructive/30 bg-destructive/10">
               <CardContent className="flex items-center gap-3 p-4">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive/10">
                   <AlertTriangle className="h-5 w-5 text-destructive" />
