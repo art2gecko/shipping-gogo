@@ -20,6 +20,133 @@ function validateChannel(channel: string): channel is ValidChannel {
   return VALID_CHANNELS.includes(channel as ValidChannel);
 }
 
+// ─── Credential field definitions per channel ────────────────────────────────
+
+interface CredentialField {
+  envKey: string;
+  label: string;
+  secret: boolean;
+  defaultValue?: string;
+}
+
+const CHANNEL_CREDENTIAL_FIELDS: Record<ValidChannel, CredentialField[]> = {
+  ebay: [
+    { envKey: "EBAY_CLIENT_ID", label: "Client ID", secret: false },
+    { envKey: "EBAY_CLIENT_SECRET", label: "Client Secret", secret: true },
+    { envKey: "EBAY_REDIRECT_URI", label: "Redirect URI", secret: false, defaultValue: "http://localhost:3000/api/integrations/ebay/callback" },
+  ],
+  amazon: [
+    { envKey: "AMAZON_LWA_CLIENT_ID", label: "LWA Client ID", secret: false },
+    { envKey: "AMAZON_LWA_CLIENT_SECRET", label: "LWA Client Secret", secret: true },
+    { envKey: "AMAZON_REDIRECT_URI", label: "Redirect URI", secret: false, defaultValue: "http://localhost:3000/api/integrations/amazon/callback" },
+  ],
+  temu: [
+    { envKey: "TEMU_APP_KEY", label: "App Key", secret: false },
+    { envKey: "TEMU_APP_SECRET", label: "App Secret", secret: true },
+    { envKey: "TEMU_REDIRECT_URI", label: "Redirect URI", secret: false, defaultValue: "http://localhost:3000/api/integrations/temu/callback" },
+  ],
+};
+
+/** Load saved credentials from the Settings table into process.env so providers can read them. */
+async function loadChannelCredentials(channel: ValidChannel): Promise<void> {
+  const fields = CHANNEL_CREDENTIAL_FIELDS[channel];
+  for (const field of fields) {
+    // Only load from DB if not already set in environment
+    if (!process.env[field.envKey]) {
+      const setting = await prisma.setting.findUnique({
+        where: { key: `cred:${field.envKey}` },
+      });
+      if (setting) {
+        process.env[field.envKey] = field.secret ? decrypt(setting.value) : setting.value;
+      }
+    }
+  }
+}
+
+// ─── GET /api/integrations/:channel/credentials ─────────────────────────────
+// Check which credentials are configured (does NOT return secret values)
+router.get("/:channel/credentials", async (req, res) => {
+  try {
+    const { channel } = req.params;
+    if (!validateChannel(channel)) {
+      res.status(400).json({ error: `Invalid channel: ${channel}` });
+      return;
+    }
+
+    const fields = CHANNEL_CREDENTIAL_FIELDS[channel];
+    const result: { key: string; label: string; secret: boolean; configured: boolean; value?: string }[] = [];
+
+    for (const field of fields) {
+      // Check env first, then DB
+      const envValue = process.env[field.envKey];
+      const dbSetting = await prisma.setting.findUnique({
+        where: { key: `cred:${field.envKey}` },
+      });
+
+      const configured = !!(envValue || dbSetting);
+      result.push({
+        key: field.envKey,
+        label: field.label,
+        secret: field.secret,
+        configured,
+        // Return non-secret values so the form can show them; never return secrets
+        value: !field.secret
+          ? (dbSetting ? dbSetting.value : envValue || field.defaultValue || "")
+          : undefined,
+      });
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error("Get credentials error:", err);
+    res.status(500).json({ error: "Failed to get credentials" });
+  }
+});
+
+// ─── POST /api/integrations/:channel/credentials ────────────────────────────
+// Save channel API credentials (stored encrypted in Settings table)
+router.post("/:channel/credentials", async (req, res) => {
+  try {
+    const { channel } = req.params;
+    if (!validateChannel(channel)) {
+      res.status(400).json({ error: `Invalid channel: ${channel}` });
+      return;
+    }
+
+    const credentials = req.body as Record<string, string>;
+    const fields = CHANNEL_CREDENTIAL_FIELDS[channel];
+    const saved: string[] = [];
+
+    for (const field of fields) {
+      const value = credentials[field.envKey];
+      if (value !== undefined && value !== "") {
+        const storeValue = field.secret ? encrypt(value) : value;
+        await prisma.setting.upsert({
+          where: { key: `cred:${field.envKey}` },
+          update: { value: storeValue },
+          create: { key: `cred:${field.envKey}`, value: storeValue },
+        });
+        // Also set in process.env so it takes effect immediately
+        process.env[field.envKey] = value;
+        saved.push(field.label);
+      }
+    }
+
+    await prisma.auditLog.create({
+      data: {
+        action: "INTEGRATION_CREDENTIALS",
+        detail: `Updated ${channel} credentials: ${saved.join(", ")}`,
+        metadata: { channel },
+      },
+    });
+
+    res.json({ message: `Saved ${saved.length} credential(s) for ${channel}` });
+  } catch (err) {
+    console.error("Save credentials error:", err);
+    res.status(500).json({ error: "Failed to save credentials" });
+  }
+});
+
 // ─── GET /api/integrations/:channel/accounts ────────────────────────────────
 // List connected accounts for a channel
 router.get("/:channel/accounts", async (req, res) => {
@@ -63,6 +190,9 @@ router.get("/:channel/start", async (req, res) => {
       res.status(400).json({ error: `Invalid channel: ${channel}` });
       return;
     }
+
+    // Load saved credentials from DB into process.env
+    await loadChannelCredentials(channel);
 
     const provider = getProvider(channel);
 
@@ -124,6 +254,9 @@ router.get("/:channel/callback", async (req, res) => {
 
     // Clean up used state
     await prisma.integrationState.delete({ where: { id: stateRecord.id } });
+
+    // Load saved credentials from DB into process.env
+    await loadChannelCredentials(channel);
 
     const provider = getProvider(channel);
 
@@ -212,6 +345,7 @@ router.post("/:channel/test", async (req, res) => {
       return;
     }
 
+    await loadChannelCredentials(channel);
     const provider = getProvider(channel);
 
     // Refresh access token if expired or about to expire

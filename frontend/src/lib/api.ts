@@ -214,6 +214,14 @@ export const users = {
 
 // ── Integrations ──
 
+export interface CredentialField {
+  key: string;
+  label: string;
+  secret: boolean;
+  configured: boolean;
+  value?: string;
+}
+
 export const integrations = {
   accounts: (channel: string) =>
     request<ChannelAccount[]>(`/api/integrations/${channel}/accounts`),
@@ -230,6 +238,13 @@ export const integrations = {
     }),
   temuManual: (data: TemuManualConnectPayload) =>
     request<ChannelAccount>("/api/integrations/temu/manual", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  credentials: (channel: string) =>
+    request<CredentialField[]>(`/api/integrations/${channel}/credentials`),
+  saveCredentials: (channel: string, data: Record<string, string>) =>
+    request<{ message: string }>(`/api/integrations/${channel}/credentials`, {
       method: "POST",
       body: JSON.stringify(data),
     }),

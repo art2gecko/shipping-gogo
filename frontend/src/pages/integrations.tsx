@@ -7,6 +7,7 @@ import {
   Unplug,
   TestTube2,
   Key,
+  Settings2,
   CheckCircle2,
   AlertCircle,
   AlertTriangle,
@@ -32,6 +33,8 @@ import {
   useTestConnection,
   useDisconnectAccount,
   useTemuManualConnect,
+  useChannelCredentials,
+  useSaveCredentials,
 } from "@/hooks/use-api";
 import type { ChannelAccount } from "@/types";
 
@@ -169,11 +172,14 @@ function AccountRow({
 
 function ChannelCard({ channel }: { channel: ChannelDef }) {
   const { data: accounts, isLoading } = useChannelAccounts(channel.key);
+  const { data: credentials } = useChannelCredentials(channel.key);
   const startIntegration = useStartIntegration();
   const [showTokenDialog, setShowTokenDialog] = React.useState(false);
+  const [showCredentialsDialog, setShowCredentialsDialog] = React.useState(false);
 
   const accountCount = accounts?.length ?? 0;
   const hasAccounts = accountCount > 0;
+  const allConfigured = credentials?.every((c) => c.configured) ?? false;
 
   return (
     <Card>
@@ -191,6 +197,11 @@ function ChannelCard({ channel }: { channel: ChannelDef }) {
                     {accountCount} {accountCount === 1 ? "store" : "stores"}
                   </Badge>
                 )}
+                {!allConfigured && (
+                  <Badge variant="outline" className="text-xs text-orange-600 border-orange-300">
+                    Needs Setup
+                  </Badge>
+                )}
               </div>
               <CardDescription>{channel.description}</CardDescription>
             </div>
@@ -198,8 +209,22 @@ function ChannelCard({ channel }: { channel: ChannelDef }) {
           <div className="flex gap-2">
             <Button
               size="sm"
+              variant="outline"
+              onClick={() => setShowCredentialsDialog(true)}
+            >
+              <Settings2 className="h-4 w-4" />
+              Setup
+            </Button>
+            <Button
+              size="sm"
               disabled={startIntegration.isPending}
-              onClick={() => startIntegration.mutate(channel.key)}
+              onClick={() => {
+                if (!allConfigured) {
+                  setShowCredentialsDialog(true);
+                  return;
+                }
+                startIntegration.mutate(channel.key);
+              }}
             >
               {startIntegration.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -230,7 +255,9 @@ function ChannelCard({ channel }: { channel: ChannelDef }) {
           </div>
         ) : !hasAccounts ? (
           <p className="text-sm text-muted-foreground py-4 text-center">
-            No stores connected. Click Connect to add your first store.
+            {allConfigured
+              ? "No stores connected. Click Connect to add your first store."
+              : "Click Setup to enter your API credentials, then Connect your store."}
           </p>
         ) : (
           <div className="space-y-2">
@@ -251,7 +278,137 @@ function ChannelCard({ channel }: { channel: ChannelDef }) {
           onOpenChange={setShowTokenDialog}
         />
       )}
+
+      <CredentialsDialog
+        channel={channel}
+        open={showCredentialsDialog}
+        onOpenChange={setShowCredentialsDialog}
+      />
     </Card>
+  );
+}
+
+// ─── Credentials setup dialog ────────────────────────────────────────────────
+
+const CHANNEL_HELP_URLS: Record<string, string> = {
+  ebay: "https://developer.ebay.com/my/keys",
+  amazon: "https://sellercentral.amazon.com/apps/manage",
+  temu: "https://seller.temu.com",
+};
+
+function CredentialsDialog({
+  channel,
+  open,
+  onOpenChange,
+}: {
+  channel: ChannelDef;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const { data: fields, isLoading } = useChannelCredentials(channel.key);
+  const saveCredentials = useSaveCredentials();
+  const [values, setValues] = React.useState<Record<string, string>>({});
+
+  // Pre-fill non-secret values when fields load
+  React.useEffect(() => {
+    if (fields) {
+      const initial: Record<string, string> = {};
+      for (const f of fields) {
+        if (f.value && !f.secret) {
+          initial[f.key] = f.value;
+        }
+      }
+      setValues(initial);
+    }
+  }, [fields]);
+
+  const handleSave = () => {
+    // Only send fields that have a value
+    const toSave: Record<string, string> = {};
+    for (const [k, v] of Object.entries(values)) {
+      if (v.trim()) toSave[k] = v.trim();
+    }
+    if (Object.keys(toSave).length === 0) return;
+
+    saveCredentials.mutate(
+      { channel: channel.key, data: toSave },
+      { onSuccess: () => onOpenChange(false) },
+    );
+  };
+
+  const helpUrl = CHANNEL_HELP_URLS[channel.key];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{channel.name} API Credentials</DialogTitle>
+          <DialogDescription>
+            Enter your {channel.name} developer credentials to enable OAuth
+            connection.
+            {helpUrl && (
+              <>
+                {" "}Get your credentials at{" "}
+                <a
+                  href={helpUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline"
+                >
+                  {channel.name} Developer Portal
+                </a>
+                .
+              </>
+            )}
+          </DialogDescription>
+        </DialogHeader>
+        {isLoading ? (
+          <div className="space-y-4">
+            <Skeleton className="h-10" />
+            <Skeleton className="h-10" />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {fields?.map((field) => (
+              <div key={field.key} className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  {field.label}
+                  {field.configured && (
+                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                  )}
+                </Label>
+                <Input
+                  type={field.secret ? "password" : "text"}
+                  value={values[field.key] || ""}
+                  onChange={(e) =>
+                    setValues((prev) => ({ ...prev, [field.key]: e.target.value }))
+                  }
+                  placeholder={
+                    field.secret && field.configured
+                      ? "Leave blank to keep existing"
+                      : `Enter ${field.label}`
+                  }
+                />
+              </div>
+            ))}
+          </div>
+        )}
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={saveCredentials.isPending}
+          >
+            {saveCredentials.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : null}
+            Save Credentials
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

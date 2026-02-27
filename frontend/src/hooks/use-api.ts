@@ -366,6 +366,29 @@ export function useTemuManualConnect() {
   });
 }
 
+export function useChannelCredentials(channel: string) {
+  return useQuery({
+    queryKey: ["integrations", channel, "credentials"],
+    queryFn: () => api.integrations.credentials(channel),
+    enabled: !!channel,
+  });
+}
+
+export function useSaveCredentials() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ channel, data }: { channel: string; data: Record<string, string> }) =>
+      api.integrations.saveCredentials(channel, data),
+    onSuccess: (result, variables) => {
+      toast({ title: "Credentials Saved", description: result.message });
+      qc.invalidateQueries({ queryKey: ["integrations", variables.channel, "credentials"] });
+    },
+    onError: (err: ApiError) => {
+      toast({ title: "Save Failed", description: err.message, variant: "destructive" });
+    },
+  });
+}
+
 // ── Marketplace (Label Purchase + Tracking Upload) ──
 
 export function usePurchaseLabel() {
