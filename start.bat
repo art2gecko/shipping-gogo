@@ -24,56 +24,50 @@ if errorlevel 1 (
 cd ..
 
 echo [3/5] Checking PostgreSQL...
-REM Try Docker first, fall back to local PostgreSQL
-docker compose up -d db 2>nul
-if errorlevel 1 (
-    echo Docker not available, checking for local PostgreSQL...
-    where pg_isready >nul 2>nul
-    if errorlevel 1 (
-        REM pg_isready not on PATH, try common install locations
-        set "PGBIN="
-        if exist "C:\Program Files\PostgreSQL\17\bin\pg_isready.exe" set "PGBIN=C:\Program Files\PostgreSQL\17\bin"
-        if exist "C:\Program Files\PostgreSQL\16\bin\pg_isready.exe" set "PGBIN=C:\Program Files\PostgreSQL\16\bin"
-        if exist "C:\Program Files\PostgreSQL\15\bin\pg_isready.exe" set "PGBIN=C:\Program Files\PostgreSQL\15\bin"
-        if defined PGBIN (
-            echo Found PostgreSQL at !PGBIN!
-        ) else (
-            echo.
-            echo ERROR: PostgreSQL is not installed.
-            echo.
-            echo Install ONE of these:
-            echo   1. PostgreSQL for Windows: https://www.postgresql.org/download/windows/
-            echo      - Set superuser password to: postgres
-            echo      - Keep default port: 5432
-            echo   2. Docker Desktop: https://www.docker.com/products/docker-desktop
-            echo.
-            pause
-            exit /b 1
-        )
-    )
-    REM Create the database if it doesn't exist
-    echo Creating database if needed...
-    set PGPASSWORD=postgres
-    psql -U postgres -h localhost -tc "SELECT 1 FROM pg_database WHERE datname='shipping_gogo'" 2>nul | findstr "1" >nul
-    if errorlevel 1 (
-        psql -U postgres -h localhost -c "CREATE DATABASE shipping_gogo;" 2>nul
+
+REM Check if port 5432 is already in use (local PostgreSQL)
+set "PORT_IN_USE=0"
+netstat -an 2>nul | findstr "LISTENING" | findstr ":5432 " >nul 2>nul
+if not errorlevel 1 set "PORT_IN_USE=1"
+
+if "!PORT_IN_USE!"=="1" (
+    echo Found PostgreSQL already running on port 5432.
+    echo Skipping Docker, using existing PostgreSQL...
+    REM Try to create database using psql if available
+    set "PGPASSWORD=postgres"
+    where psql >nul 2>nul
+    if not errorlevel 1 (
+        psql -U postgres -h localhost -tc "SELECT 1 FROM pg_database WHERE datname='shipping_gogo'" 2>nul | findstr "1" >nul
         if errorlevel 1 (
-            echo.
-            echo ERROR: Cannot connect to PostgreSQL.
-            echo Make sure PostgreSQL is running and password for user "postgres" is "postgres".
-            echo.
-            pause
-            exit /b 1
+            psql -U postgres -h localhost -c "CREATE DATABASE shipping_gogo;" 2>nul
+            if errorlevel 1 (
+                echo WARNING: Could not create database via psql, Prisma will try directly...
+            ) else (
+                echo Database created.
+            )
+        ) else (
+            echo Database already exists.
         )
-        echo Database created.
-    ) else (
-        echo Database already exists.
     )
 ) else (
+    REM Port 5432 is free, try Docker
+    docker compose up -d db 2>nul
+    if errorlevel 1 (
+        echo.
+        echo ERROR: Port 5432 is not in use and Docker is not available.
+        echo.
+        echo Install ONE of these:
+        echo   1. PostgreSQL for Windows: https://www.postgresql.org/download/windows/
+        echo      - Set superuser password to: postgres
+        echo      - Keep default port: 5432
+        echo   2. Docker Desktop: https://www.docker.com/products/docker-desktop
+        echo.
+        pause
+        exit /b 1
+    )
     echo PostgreSQL started via Docker.
     echo Waiting for PostgreSQL to be ready...
     timeout /t 5 /nobreak >nul
-    REM Verify Docker DB accepts connections with our credentials
     docker compose exec -T db pg_isready -U postgres >nul 2>nul
     if errorlevel 1 (
         echo Still waiting...
