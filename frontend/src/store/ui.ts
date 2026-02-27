@@ -17,9 +17,15 @@ export const useUIStore = create<UIState>((set) => ({
     return stored === "true";
   })(),
   darkMode: (() => {
+    // One-time reset: clear stale auto-detected dark mode from previous color scheme
+    const migrated = localStorage.getItem("dark_mode_v2");
+    if (!migrated) {
+      localStorage.removeItem("dark_mode");
+      localStorage.setItem("dark_mode_v2", "1");
+    }
     const stored = localStorage.getItem("dark_mode");
     if (stored !== null) return stored === "true";
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    return false; // default to light mode for ops dashboards
   })(),
 
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
