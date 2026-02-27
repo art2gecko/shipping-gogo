@@ -21,12 +21,10 @@ router.post("/daily-run", async (_req, res) => {
 // POST /api/jobs/sync-orders
 router.post("/sync-orders", async (_req, res) => {
   try {
-    await recordAudit({
-      action: AuditAction.ORDER_IMPORTED,
-      detail: "Manual order sync triggered (no marketplace integrations configured yet)",
-    });
-
-    res.json({ message: "Order sync triggered. Connect marketplace APIs to enable automatic syncing." });
+    const { runOrderSync } = await import("../jobs/orderSync");
+    // Fire and return immediately
+    runOrderSync().catch((err: unknown) => console.error("Order sync error:", err));
+    res.json({ message: "Order sync started for all active marketplace accounts" });
   } catch (err) {
     console.error("Sync orders error:", err);
     res.status(500).json({ error: "Failed to trigger sync" });

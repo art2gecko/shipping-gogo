@@ -18,4 +18,20 @@ export function getProvider(channel: string): ChannelProvider {
 }
 
 export { ebayProvider, amazonProvider, temuProvider };
-export type { ChannelProvider, TokenResult, RefreshResult, SellerIdentity, TestResult } from "./types";
+export type {
+  ChannelProvider,
+  TokenResult,
+  RefreshResult,
+  SellerIdentity,
+  TestResult,
+  FetchOrdersParams,
+  FetchOrdersResult,
+  NormalizedOrder,
+  NormalizedOrderItem,
+  PurchaseLabelParams,
+  PurchaseLabelResult,
+  UploadTrackingParams,
+  UploadTrackingResult,
+  ShipAddress,
+  PackageDetails,
+} from "./types";

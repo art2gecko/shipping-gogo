@@ -12,6 +12,8 @@ import settingsRouter from "./routes/settings";
 import usersRouter from "./routes/users";
 import jobsRouter from "./routes/jobs";
 import integrationsRouter from "./routes/integrations";
+import syncRouter from "./routes/sync";
+import marketplaceRouter from "./routes/marketplace";
 
 const app = express();
 const PORT = parseInt(process.env.PORT ?? "3000", 10);
@@ -34,6 +36,8 @@ app.use("/api/settings", settingsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/jobs", jobsRouter);
 app.use("/api/integrations", integrationsRouter);
+app.use("/api/sync", syncRouter);
+app.use("/api/marketplace", marketplaceRouter);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
