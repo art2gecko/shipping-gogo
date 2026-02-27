@@ -19,7 +19,6 @@ import {
   Search,
   Command,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Tooltip,
@@ -107,30 +106,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         target.tagName === "SELECT" ||
         target.isContentEditable;
 
-      // Cmd+K or Ctrl+K → command palette
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setCmdOpen(true);
         return;
       }
 
-      // Don't process other shortcuts when in an input
       if (isInput) return;
 
-      // "/" → focus search / open command palette
       if (e.key === "/") {
         e.preventDefault();
         setCmdOpen(true);
         return;
       }
 
-      // Escape → close command palette
       if (e.key === "Escape" && cmdOpen) {
         setCmdOpen(false);
         return;
       }
 
-      // G + <key> navigation sequences
       if (e.key === "g" && !gPressed) {
         gPressed = true;
         clearTimeout(gTimer);
@@ -173,7 +167,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     };
   }, [navigate, cmdOpen]);
 
-  // Filtered command palette items
   const cmdItems = React.useMemo(() => {
     const q = cmdSearch.toLowerCase();
     const allItems = [
@@ -196,10 +189,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           />
         )}
 
-        {/* Sidebar */}
+        {/* ── Sidebar (dark green) ── */}
         <aside
           className={cn(
-            "fixed inset-y-0 left-0 z-50 flex flex-col border-r bg-card transition-all duration-200 lg:static",
+            "fixed inset-y-0 left-0 z-50 flex flex-col bg-sidebar-bg text-sidebar-fg border-r border-sidebar-border transition-all duration-200 lg:static",
             sidebarCollapsed ? "lg:w-[3.5rem]" : "lg:w-56",
             sidebarOpen
               ? "w-56 translate-x-0"
@@ -207,25 +200,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
         >
           {/* Logo */}
-          <div className="flex h-14 shrink-0 items-center border-b px-3">
+          <div className="flex h-14 shrink-0 items-center border-b border-sidebar-border px-3">
             <Link to="/" className="flex items-center gap-2.5 min-w-0">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
                 <Package className="h-4 w-4" />
               </div>
               {!sidebarCollapsed && (
-                <span className="text-base font-bold tracking-tight truncate">
+                <span className="text-base font-bold tracking-tight truncate text-white">
                   ShipGo
                 </span>
               )}
             </Link>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="ml-auto lg:hidden h-8 w-8"
+            <button
+              className="ml-auto lg:hidden h-8 w-8 flex items-center justify-center rounded-md text-sidebar-fg/70 hover:text-sidebar-fg hover:bg-sidebar-hover transition-colors"
               onClick={toggleSidebar}
             >
               <X className="h-4 w-4" />
-            </Button>
+            </button>
           </div>
 
           {/* Nav links */}
@@ -248,8 +239,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         ? "h-9 w-9 justify-center mx-auto"
                         : "gap-2.5 px-2.5 py-2",
                       active
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                        ? "bg-sidebar-active text-white border-l-2 border-sidebar-accent"
+                        : "text-sidebar-fg/70 hover:bg-sidebar-hover hover:text-sidebar-fg",
                     )}
                     onClick={() => {
                       if (window.innerWidth < 1024) toggleSidebar();
@@ -260,7 +251,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       <>
                         <span className="truncate flex-1">{item.name}</span>
                         {item.shortcut && (
-                          <span className="text-[10px] text-muted-foreground/60 font-mono">
+                          <span className="text-[10px] text-sidebar-fg/40 font-mono">
                             {item.shortcut}
                           </span>
                         )}
@@ -291,13 +282,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </ScrollArea>
 
           {/* Footer */}
-          <div className="border-t p-2 space-y-1">
-            {/* Collapse toggle - desktop only */}
-            <Button
-              variant="ghost"
-              size="sm"
+          <div className="border-t border-sidebar-border p-2 space-y-1">
+            {/* Collapse toggle */}
+            <button
               className={cn(
-                "hidden lg:flex w-full text-muted-foreground hover:text-foreground h-8",
+                "hidden lg:flex w-full items-center rounded-md text-sidebar-fg/60 hover:text-sidebar-fg hover:bg-sidebar-hover transition-colors h-8 text-xs",
                 sidebarCollapsed
                   ? "justify-center px-0"
                   : "justify-start gap-2 px-2",
@@ -309,20 +298,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               ) : (
                 <>
                   <ChevronsLeft className="h-4 w-4" />
-                  <span className="text-xs">Collapse</span>
+                  <span>Collapse</span>
                 </>
               )}
-            </Button>
+            </button>
 
             {/* User section */}
             {sidebarCollapsed ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
-                    className="flex h-9 w-full items-center justify-center rounded-md hover:bg-accent transition-colors"
+                    className="flex h-9 w-full items-center justify-center rounded-md hover:bg-sidebar-hover transition-colors"
                     onClick={handleLogout}
                   >
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-white text-xs font-bold">
                       {user?.username?.charAt(0).toUpperCase() || "U"}
                     </div>
                   </button>
@@ -333,26 +322,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Tooltip>
             ) : (
               <div className="flex items-center gap-2 rounded-md px-2 py-1.5">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/15 text-white text-xs font-bold">
                   {user?.username?.charAt(0).toUpperCase() || "U"}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium truncate">
+                  <p className="text-xs font-medium truncate text-sidebar-fg">
                     {user?.username || "User"}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">
+                  <p className="text-[10px] text-sidebar-fg/50">
                     {user?.role || "Admin"}
                   </p>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 shrink-0"
+                <button
+                  className="h-7 w-7 shrink-0 flex items-center justify-center rounded-md text-sidebar-fg/60 hover:text-sidebar-fg hover:bg-sidebar-hover transition-colors"
                   onClick={handleLogout}
                   title="Logout"
                 >
                   <LogOut className="h-3.5 w-3.5" />
-                </Button>
+                </button>
               </div>
             )}
           </div>
@@ -360,45 +347,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Main content */}
         <div className="flex flex-1 flex-col overflow-hidden">
-          {/* Top bar */}
-          <header className="flex h-14 shrink-0 items-center justify-between border-b bg-card px-4 lg:px-6">
+          {/* ── Top bar (dark green) ── */}
+          <header className="flex h-14 shrink-0 items-center justify-between bg-sidebar-bg text-sidebar-fg border-b border-sidebar-border px-4 lg:px-6">
             <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden h-8 w-8"
+              <button
+                className="lg:hidden h-8 w-8 flex items-center justify-center rounded-md text-sidebar-fg/70 hover:text-sidebar-fg hover:bg-sidebar-hover transition-colors"
                 onClick={toggleSidebar}
               >
                 <Menu className="h-4 w-4" />
-              </Button>
-              <h1 className="text-base font-semibold">{pageTitle}</h1>
+              </button>
+              <h1 className="text-base font-semibold text-white">{pageTitle}</h1>
             </div>
             <div className="flex items-center gap-1">
               {/* Command palette trigger */}
-              <Button
-                variant="outline"
-                size="sm"
-                className="hidden sm:flex h-8 gap-2 text-xs text-muted-foreground px-3"
+              <button
+                className="hidden sm:flex h-8 items-center gap-2 rounded-md border border-sidebar-border bg-sidebar-hover px-3 text-xs text-sidebar-fg/70 hover:text-sidebar-fg hover:bg-white/10 transition-colors"
                 onClick={() => setCmdOpen(true)}
               >
                 <Search className="h-3 w-3" />
                 <span>Search...</span>
-                <kbd className="ml-1 pointer-events-none inline-flex h-5 items-center gap-0.5 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium">
+                <kbd className="ml-1 pointer-events-none inline-flex h-5 items-center gap-0.5 rounded border border-sidebar-border bg-sidebar-active px-1.5 font-mono text-[10px] font-medium text-sidebar-fg/60">
                   <Command className="h-2.5 w-2.5" />K
                 </kbd>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="sm:hidden h-8 w-8"
+              </button>
+              <button
+                className="sm:hidden h-8 w-8 flex items-center justify-center rounded-md text-sidebar-fg/70 hover:text-sidebar-fg hover:bg-sidebar-hover transition-colors"
                 onClick={() => setCmdOpen(true)}
               >
                 <Search className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
+              </button>
+              <button
+                className="h-8 w-8 flex items-center justify-center rounded-md text-sidebar-fg/70 hover:text-sidebar-fg hover:bg-sidebar-hover transition-colors"
                 onClick={toggleDarkMode}
                 title="Toggle theme"
               >
@@ -407,12 +386,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 ) : (
                   <Moon className="h-4 w-4" />
                 )}
-              </Button>
+              </button>
             </div>
           </header>
 
-          {/* Page content */}
-          <main className="flex-1 overflow-auto bg-muted/30">{children}</main>
+          {/* Page content (light workspace) */}
+          <main className="flex-1 overflow-auto bg-background">{children}</main>
         </div>
 
         {/* Command Palette */}
@@ -441,7 +420,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   cmdItems.map((item) => (
                     <button
                       key={item.name + item.href}
-                      className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors text-left"
+                      className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors text-left"
                       onClick={() => {
                         navigate(item.href);
                         setCmdOpen(false);

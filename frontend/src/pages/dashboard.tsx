@@ -45,6 +45,7 @@ const auditActionLabels: Record<AuditAction, string> = {
   INTEGRATION_CONNECT: "Integration Connected",
   INTEGRATION_TEST: "Integration Tested",
   INTEGRATION_DISCONNECT: "Integration Disconnected",
+  INTEGRATION_CREDENTIALS: "Credentials Updated",
 };
 
 const auditActionIcons: Record<AuditAction, typeof Package> = {
@@ -62,6 +63,7 @@ const auditActionIcons: Record<AuditAction, typeof Package> = {
   INTEGRATION_CONNECT: Activity,
   INTEGRATION_TEST: Activity,
   INTEGRATION_DISCONNECT: Activity,
+  INTEGRATION_CREDENTIALS: Activity,
 };
 
 const auditActionColors: Record<AuditAction, string> = {
@@ -79,6 +81,7 @@ const auditActionColors: Record<AuditAction, string> = {
   INTEGRATION_CONNECT: "text-audit-integration",
   INTEGRATION_TEST: "text-audit-integration",
   INTEGRATION_DISCONNECT: "text-audit-neutral",
+  INTEGRATION_CREDENTIALS: "text-audit-integration",
 };
 
 export default function DashboardPage() {

@@ -198,7 +198,7 @@ function ChannelCard({ channel }: { channel: ChannelDef }) {
                   </Badge>
                 )}
                 {!allConfigured && (
-                  <Badge variant="outline" className="text-xs text-orange-600 border-orange-300">
+                  <Badge variant="warning" className="text-xs">
                     Needs Setup
                   </Badge>
                 )}

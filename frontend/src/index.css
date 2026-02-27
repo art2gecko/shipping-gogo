@@ -3,25 +3,26 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: 0 0% 99%;
-  --foreground: 222 47% 11%;
-  --card: 0 0% 100%;
+  /* ── ShipStation-inspired Light Theme ── */
+  --background: 210 11% 95%;      /* #F1F2F3 canvas */
+  --foreground: 222 47% 11%;      /* #0F172A text */
+  --card: 0 0% 100%;              /* #FFFFFF surface */
   --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
-  --primary: 221 83% 53%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 220 14% 93%;
-  --secondary-foreground: 220 39% 11%;
-  --muted: 220 14% 96%;
-  --muted-foreground: 220 9% 46%;
-  --accent: 214 20% 92%;
-  --accent-foreground: 220 39% 11%;
+  --primary: 152 72% 25%;         /* #126C41 primaryGreen */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 214 32% 91%;       /* light neutral */
+  --secondary-foreground: 222 47% 11%;
+  --muted: 210 11% 93%;
+  --muted-foreground: 215 16% 47%; /* #64748B mutedText */
+  --accent: 209 34% 53%;          /* #5D8DB4 accentBlue */
+  --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 220 13% 91%;
-  --input: 220 13% 91%;
-  --ring: 221 83% 53%;
+  --border: 214 32% 91%;          /* #E2E8F0 */
+  --input: 214 32% 91%;
+  --ring: 152 72% 25%;            /* primaryGreen focus ring */
   --radius: 0.5rem;
 
   --success: 152 69% 40%;
@@ -29,7 +30,16 @@
   --warning: 38 92% 50%;
   --warning-foreground: 38 95% 12%;
 
-  /* Shipping state colors */
+  /* ── Sidebar (dark green) ── */
+  --sidebar-bg: 150 100% 10%;     /* #003311 brandGreen900 */
+  --sidebar-fg: 144 18% 91%;      /* #EAF2ED soft light */
+  --sidebar-muted: 144 18% 91%;
+  --sidebar-hover: 0 0% 100% / 0.06;
+  --sidebar-active: 0 0% 100% / 0.10;
+  --sidebar-accent: 209 34% 53%;  /* accentBlue */
+  --sidebar-border: 0 0% 100% / 0.08;
+
+  /* ── Shipping state colors ── */
   --status-new: 220 14% 62%;
   --status-new-foreground: 0 0% 100%;
   --status-ready: 189 75% 41%;
@@ -49,7 +59,7 @@
   --status-packed: 189 75% 34%;
   --status-packed-foreground: 0 0% 100%;
 
-  /* Marketplace brand colors */
+  /* ── Marketplace brand colors ── */
   --channel-amazon: 33 100% 50%;
   --channel-amazon-foreground: 0 0% 100%;
   --channel-ebay: 196 80% 44%;
@@ -59,7 +69,7 @@
   --channel-temu: 330 65% 48%;
   --channel-temu-foreground: 0 0% 100%;
 
-  /* Audit/activity icon colors */
+  /* ── Audit/activity icon colors ── */
   --audit-import: 220 14% 62%;
   --audit-batch: 262 50% 52%;
   --audit-label: 262 68% 56%;
@@ -68,9 +78,9 @@
   --audit-exception: 0 84% 60%;
   --audit-resolved: 152 69% 40%;
   --audit-neutral: 220 9% 46%;
-  --audit-integration: 221 83% 53%;
+  --audit-integration: 152 72% 25%;
 
-  /* Dashboard KPI accent colors */
+  /* ── Dashboard KPI accent colors ── */
   --kpi-unshipped: 220 14% 62%;
   --kpi-unshipped-bg: 220 14% 95%;
   --kpi-ready: 189 75% 41%;
@@ -85,30 +95,36 @@
 }
 
 .dark {
-  --background: 222 47% 6%;
-  --foreground: 210 20% 98%;
-  --card: 222 47% 8%;
-  --card-foreground: 210 20% 98%;
-  --popover: 222 47% 7%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 217 91% 60%;
-  --primary-foreground: 222 47% 11%;
-  --secondary: 217 33% 14%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20% 65%;
-  --accent: 214 30% 20%;
-  --accent-foreground: 210 40% 98%;
+  --background: 150 40% 5%;
+  --foreground: 144 18% 91%;
+  --card: 150 35% 8%;
+  --card-foreground: 144 18% 91%;
+  --popover: 150 35% 7%;
+  --popover-foreground: 144 18% 91%;
+  --primary: 152 60% 45%;
+  --primary-foreground: 150 100% 5%;
+  --secondary: 150 20% 14%;
+  --secondary-foreground: 144 18% 91%;
+  --muted: 150 20% 14%;
+  --muted-foreground: 144 10% 60%;
+  --accent: 209 34% 53%;
+  --accent-foreground: 0 0% 100%;
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
-  --border: 217 33% 17%;
-  --input: 217 33% 17%;
-  --ring: 224 76% 48%;
+  --border: 150 15% 16%;
+  --input: 150 15% 16%;
+  --ring: 152 60% 45%;
 
   --success: 152 60% 45%;
   --success-foreground: 152 60% 10%;
   --warning: 38 90% 55%;
   --warning-foreground: 38 90% 10%;
+
+  --sidebar-bg: 150 100% 7%;
+  --sidebar-fg: 144 18% 91%;
+  --sidebar-hover: 0 0% 100% / 0.06;
+  --sidebar-active: 0 0% 100% / 0.10;
+  --sidebar-border: 0 0% 100% / 0.06;
 
   /* Shipping state colors (dark) */
   --status-new: 220 20% 60%;
@@ -148,8 +164,8 @@
   --audit-tracking: 189 65% 48%;
   --audit-exception: 0 72% 51%;
   --audit-resolved: 152 60% 45%;
-  --audit-neutral: 215 20% 65%;
-  --audit-integration: 217 91% 60%;
+  --audit-neutral: 144 10% 60%;
+  --audit-integration: 152 60% 45%;
 
   /* Dashboard KPI accent colors (dark) */
   --kpi-unshipped: 220 20% 60%;
@@ -186,6 +202,15 @@
   --color-success-foreground: hsl(var(--success-foreground));
   --color-warning: hsl(var(--warning));
   --color-warning-foreground: hsl(var(--warning-foreground));
+
+  /* Sidebar */
+  --color-sidebar-bg: hsl(var(--sidebar-bg));
+  --color-sidebar-fg: hsl(var(--sidebar-fg));
+  --color-sidebar-muted: hsl(var(--sidebar-muted));
+  --color-sidebar-hover: hsl(var(--sidebar-hover));
+  --color-sidebar-active: hsl(var(--sidebar-active));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-border: hsl(var(--sidebar-border));
 
   /* Shipping states */
   --color-status-new: hsl(var(--status-new));

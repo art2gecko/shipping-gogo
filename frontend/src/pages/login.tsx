@@ -58,13 +58,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <Package className="h-7 w-7 text-primary" />
+          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+            <Package className="h-7 w-7" />
           </div>
-          <CardTitle className="text-2xl">ShipGo Dashboard</CardTitle>
+          <CardTitle className="text-2xl">ShipGo</CardTitle>
           <CardDescription>Sign in to manage fulfillment</CardDescription>
         </CardHeader>
         <CardContent>
