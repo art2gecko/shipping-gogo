@@ -1,5 +1,9 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+import path from "path";
 import crypto from "crypto";
+
+// Explicitly load .env from project root
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 16;
@@ -8,7 +12,12 @@ const AUTH_TAG_LENGTH = 16;
 function getKey(): Buffer {
   const key = process.env.TOKEN_ENCRYPTION_KEY;
   if (!key) {
-    throw new Error("TOKEN_ENCRYPTION_KEY environment variable is required");
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("TOKEN_ENCRYPTION_KEY environment variable is required");
+    }
+    // Dev fallback — safe for local development only
+    console.warn("WARNING: TOKEN_ENCRYPTION_KEY not set, using dev fallback key");
+    return crypto.createHash("sha256").update("dev-fallback-key").digest();
   }
   // Derive a 32-byte key from the env var using SHA-256
   return crypto.createHash("sha256").update(key).digest();
