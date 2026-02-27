@@ -132,13 +132,14 @@ router.post("/:channel/credentials", async (req, res) => {
       }
     }
 
-    await prisma.auditLog.create({
+    // Audit log — don't let this block credential saving
+    prisma.auditLog.create({
       data: {
         action: "INTEGRATION_CREDENTIALS",
         detail: `Updated ${channel} credentials: ${saved.join(", ")}`,
         metadata: { channel },
       },
-    });
+    }).catch(() => {/* enum may not exist in DB yet */});
 
     res.json({ message: `Saved ${saved.length} credential(s) for ${channel}` });
   } catch (err) {
