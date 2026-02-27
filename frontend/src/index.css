@@ -153,13 +153,13 @@
 
   /* Dashboard KPI accent colors (dark) */
   --kpi-unshipped: 220 20% 60%;
-  --kpi-unshipped-bg: 220 20% 14%;
+  --kpi-unshipped-bg: 220 25% 22%;
   --kpi-ready: 189 65% 48%;
-  --kpi-ready-bg: 189 65% 14%;
+  --kpi-ready-bg: 189 40% 22%;
   --kpi-labels: 262 58% 62%;
-  --kpi-labels-bg: 262 58% 14%;
+  --kpi-labels-bg: 262 35% 22%;
   --kpi-batches: 262 45% 58%;
-  --kpi-batches-bg: 262 45% 14%;
+  --kpi-batches-bg: 262 30% 22%;
 }
 
 @theme inline {
