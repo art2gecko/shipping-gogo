@@ -72,7 +72,13 @@ if errorlevel 1 (
 ) else (
     echo PostgreSQL started via Docker.
     echo Waiting for PostgreSQL to be ready...
-    timeout /t 3 /nobreak >nul
+    timeout /t 5 /nobreak >nul
+    REM Verify Docker DB accepts connections with our credentials
+    docker compose exec -T db pg_isready -U postgres >nul 2>nul
+    if errorlevel 1 (
+        echo Still waiting...
+        timeout /t 5 /nobreak >nul
+    )
 )
 
 REM Set DATABASE_URL explicitly so Prisma always finds it
@@ -87,7 +93,13 @@ if errorlevel 1 (
 )
 call npx prisma db push --accept-data-loss
 if errorlevel 1 (
-    echo ERROR: Database schema push failed
+    echo.
+    echo ERROR: Database schema push failed.
+    echo.
+    echo If you see "Authentication failed", run:
+    echo   docker compose down -v
+    echo Then re-run start.bat to recreate the database with correct credentials.
+    echo.
     pause
     exit /b 1
 )
