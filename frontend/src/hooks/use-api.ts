@@ -379,9 +379,9 @@ export function useSaveCredentials() {
   return useMutation({
     mutationFn: ({ channel, data }: { channel: string; data: Record<string, string> }) =>
       api.integrations.saveCredentials(channel, data),
-    onSuccess: (result, variables) => {
+    onSuccess: async (result, variables) => {
       toast({ title: "Credentials Saved", description: result.message });
-      qc.invalidateQueries({ queryKey: ["integrations", variables.channel, "credentials"] });
+      await qc.invalidateQueries({ queryKey: ["integrations", variables.channel, "credentials"] });
     },
     onError: (err: ApiError) => {
       toast({ title: "Save Failed", description: err.message, variant: "destructive" });

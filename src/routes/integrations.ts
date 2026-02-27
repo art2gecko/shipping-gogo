@@ -58,6 +58,8 @@ async function loadChannelCredentials(channel: ValidChannel): Promise<void> {
       });
       if (setting) {
         process.env[field.envKey] = field.secret ? decrypt(setting.value) : setting.value;
+      } else if (field.defaultValue) {
+        process.env[field.envKey] = field.defaultValue;
       }
     }
   }
@@ -83,7 +85,7 @@ router.get("/:channel/credentials", async (req, res) => {
         where: { key: `cred:${field.envKey}` },
       });
 
-      const configured = !!(envValue || dbSetting);
+      const configured = !!(envValue || dbSetting || field.defaultValue);
       result.push({
         key: field.envKey,
         label: field.label,
