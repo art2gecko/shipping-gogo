@@ -82,9 +82,9 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-call npx prisma migrate deploy --no-hints
+call npx prisma db push --accept-data-loss --skip-generate
 if errorlevel 1 (
-    echo ERROR: Database migration failed
+    echo ERROR: Database schema push failed
     pause
     exit /b 1
 )
