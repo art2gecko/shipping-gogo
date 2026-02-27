@@ -14,6 +14,9 @@ import {
   Truck,
   Clock,
   Activity,
+  ScanBarcode,
+  Plug,
+  Calendar,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -60,7 +63,7 @@ const auditActionIcons: Record<AuditAction, typeof Package> = {
   EXCEPTION_CREATED: AlertTriangle,
   EXCEPTION_RESOLVED: CheckCircle,
   SETTINGS_UPDATED: Activity,
-  INTEGRATION_CONNECT: Activity,
+  INTEGRATION_CONNECT: Plug,
   INTEGRATION_TEST: Activity,
   INTEGRATION_DISCONNECT: Activity,
   INTEGRATION_CREDENTIALS: Activity,
@@ -100,14 +103,24 @@ export default function DashboardPage() {
   const total = unshipped + ready + onHold;
   const shippedPercent = total > 0 ? Math.round((ready / total) * 100) : 0;
 
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
     <div className="space-y-6 p-4 lg:p-6">
-      {/* Header */}
+      {/* ── Today header + actions ── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">
-            Today's fulfillment overview
-          </p>
+          <div className="flex items-center gap-2 text-muted-foreground text-sm mb-0.5">
+            <Calendar className="h-3.5 w-3.5" />
+            <span>{today}</span>
+          </div>
+          <h1 className="text-lg font-semibold text-foreground">
+            Fulfillment Overview
+          </h1>
         </div>
         <div className="flex gap-2">
           <Button
@@ -138,145 +151,150 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Shipping Pipeline */}
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              Shipping Pipeline
-            </CardTitle>
-            {stats.isLoading ? (
-              <Skeleton className="h-5 w-16" />
-            ) : (
-              <Badge variant="outline" className="text-xs font-mono">
-                {total} active
-              </Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {stats.isLoading ? (
-            <Skeleton className="h-24" />
-          ) : (
-            <>
-              {/* Pipeline stages */}
-              <div className="flex items-center gap-1 mb-4">
-                <PipelineStage
-                  label="Unshipped"
-                  count={unshipped}
-                  color="bg-status-new"
-                  total={total}
-                  onClick={() => navigate("/orders?status=NEW")}
-                />
-                <ArrowRight className="h-4 w-4 text-muted-foreground/40 shrink-0" />
-                <PipelineStage
-                  label="Ready"
-                  count={ready}
-                  color="bg-status-ready"
-                  total={total}
-                  onClick={() => navigate("/orders?status=READY")}
-                />
-                <ArrowRight className="h-4 w-4 text-muted-foreground/40 shrink-0" />
-                <PipelineStage
-                  label="On Hold"
-                  count={onHold}
-                  color="bg-status-hold"
-                  total={total}
-                  onClick={() => navigate("/orders?status=HOLD")}
-                />
-                <ArrowRight className="h-4 w-4 text-muted-foreground/40 shrink-0" />
-                <PipelineStage
-                  label="Exceptions"
-                  count={exceptions}
-                  color="bg-status-error"
-                  total={total}
-                  onClick={() => navigate("/exceptions")}
-                  isAlert={exceptions > 0}
-                />
-              </div>
-
-              {/* Progress bar */}
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Pipeline progress</span>
-                  <span className="font-medium">{shippedPercent}% ready to ship</span>
-                </div>
-                <div className="h-2 rounded-full bg-muted overflow-hidden flex">
-                  {total > 0 && (
-                    <>
-                      <div
-                        className="bg-status-ready transition-all duration-500"
-                        style={{ width: `${(ready / total) * 100}%` }}
-                      />
-                      <div
-                        className="bg-status-new transition-all duration-500"
-                        style={{ width: `${(unshipped / total) * 100}%` }}
-                      />
-                      <div
-                        className="bg-status-hold transition-all duration-500"
-                        style={{ width: `${(onHold / total) * 100}%` }}
-                      />
-                    </>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* KPI Cards Row */}
+      {/* ── Queue cards row (task-first: what needs attention) ── */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <KPICard
-          label="Unshipped Orders"
-          value={unshipped}
+        <QueueCard
+          label="Ready to Ship"
+          count={ready}
+          icon={CheckCircle}
+          color="text-status-ready"
+          bgColor="bg-status-ready/10"
+          loading={stats.isLoading}
+          onClick={() => navigate("/orders?status=READY")}
+        />
+        <QueueCard
+          label="Unshipped"
+          count={unshipped}
           icon={Package}
           color="text-kpi-unshipped"
           bgColor="bg-kpi-unshipped-bg"
           loading={stats.isLoading}
           onClick={() => navigate("/orders?status=NEW")}
         />
-        <KPICard
-          label="Ready to Ship"
-          value={ready}
-          icon={CheckCircle}
-          color="text-kpi-ready"
-          bgColor="bg-kpi-ready-bg"
+        <QueueCard
+          label="On Hold"
+          count={onHold}
+          icon={PauseCircle}
+          color="text-status-hold"
+          bgColor="bg-status-hold/10"
           loading={stats.isLoading}
-          onClick={() => navigate("/orders?status=READY")}
+          onClick={() => navigate("/orders?status=HOLD")}
+          alert={onHold > 0}
         />
-        <KPICard
-          label="Labels Today"
-          value={labelsToday}
-          icon={Tag}
-          color="text-kpi-labels"
-          bgColor="bg-kpi-labels-bg"
+        <QueueCard
+          label="Exceptions"
+          count={exceptions}
+          icon={AlertTriangle}
+          color="text-destructive"
+          bgColor="bg-destructive/8"
           loading={stats.isLoading}
-        />
-        <KPICard
-          label="Batches Today"
-          value={batchesToday}
-          icon={Layers}
-          color="text-kpi-batches"
-          bgColor="bg-kpi-batches-bg"
-          loading={stats.isLoading}
-          onClick={() => navigate("/batches")}
+          onClick={() => navigate("/exceptions")}
+          alert={exceptions > 0}
         />
       </div>
 
-      {/* Two-column layout: Quick Actions + Activity Feed */}
+      {/* ── Pipeline progress ── */}
+      <Card>
+        <CardContent className="p-4">
+          {stats.isLoading ? (
+            <Skeleton className="h-12" />
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Pipeline</span>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span>{total} active orders</span>
+                  <span className="font-semibold text-foreground">
+                    {shippedPercent}% ready
+                  </span>
+                </div>
+              </div>
+              <div className="h-2.5 rounded-full bg-muted overflow-hidden flex">
+                {total > 0 && (
+                  <>
+                    <div
+                      className="bg-status-ready transition-all duration-500"
+                      style={{ width: `${(ready / total) * 100}%` }}
+                    />
+                    <div
+                      className="bg-status-new transition-all duration-500"
+                      style={{ width: `${(unshipped / total) * 100}%` }}
+                    />
+                    <div
+                      className="bg-status-hold transition-all duration-500"
+                      style={{ width: `${(onHold / total) * 100}%` }}
+                    />
+                  </>
+                )}
+              </div>
+              <div className="flex gap-4 text-[11px] text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-status-ready" />
+                  Ready
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-status-new" />
+                  Unshipped
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-status-hold" />
+                  On Hold
+                </span>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ── Today's stats row ── */}
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/batches")}>
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-kpi-labels-bg">
+              <Tag className="h-4 w-4 text-kpi-labels" />
+            </div>
+            <div>
+              {stats.isLoading ? (
+                <Skeleton className="h-7 w-12" />
+              ) : (
+                <p className="text-xl font-bold tabular-nums">{labelsToday}</p>
+              )}
+              <p className="text-xs text-muted-foreground">Labels Today</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate("/batches")}>
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-kpi-batches-bg">
+              <Layers className="h-4 w-4 text-kpi-batches" />
+            </div>
+            <div>
+              {stats.isLoading ? (
+                <Skeleton className="h-7 w-12" />
+              ) : (
+                <p className="text-xl font-bold tabular-nums">{batchesToday}</p>
+              )}
+              <p className="text-xs text-muted-foreground">Batches Today</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ── Two-column: Quick Actions + Activity Feed ── */}
       <div className="grid gap-6 lg:grid-cols-5">
         {/* Quick Actions */}
         <div className="lg:col-span-2 space-y-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
                 Quick Actions
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="space-y-1.5">
               <QuickAction
                 label="Create Batch"
                 description="Group ready orders for picking"
@@ -286,7 +304,7 @@ export default function DashboardPage() {
               <QuickAction
                 label="Scan Serials"
                 description="Warehouse barcode scanning"
-                icon={CheckCircle}
+                icon={ScanBarcode}
                 onClick={() => navigate("/serial-capture")}
               />
               <QuickAction
@@ -299,25 +317,25 @@ export default function DashboardPage() {
               <QuickAction
                 label="Manage Integrations"
                 description="Amazon, eBay, Temu accounts"
-                icon={Activity}
+                icon={Plug}
                 onClick={() => navigate("/settings/integrations")}
               />
             </CardContent>
           </Card>
 
-          {/* Alert Card for exceptions */}
+          {/* Exception alert */}
           {exceptions > 0 && (
-            <Card className="border-destructive/30 bg-destructive/10">
+            <Card className="border-destructive/20">
               <CardContent className="flex items-center gap-3 p-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive/10">
-                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive/10">
+                  <AlertTriangle className="h-4 w-4 text-destructive" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium">
                     {exceptions} unresolved exception{exceptions !== 1 ? "s" : ""}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Address issues, failed labels, or auth problems need attention
+                    Address issues or failed labels need attention
                   </p>
                 </div>
                 <Button
@@ -336,7 +354,7 @@ export default function DashboardPage() {
         {/* Activity Feed */}
         <Card className="lg:col-span-3">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-semibold flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <Activity className="h-4 w-4 text-muted-foreground" />
               Activity Feed
             </CardTitle>
@@ -345,7 +363,7 @@ export default function DashboardPage() {
             {auditLogs.isLoading ? (
               <div className="space-y-3">
                 {Array.from({ length: 8 }).map((_, i) => (
-                  <Skeleton key={i} className="h-12" />
+                  <Skeleton key={i} className="h-10" />
                 ))}
               </div>
             ) : !auditLogs.data || auditLogs.data.length === 0 ? (
@@ -356,8 +374,8 @@ export default function DashboardPage() {
                 </p>
               </div>
             ) : (
-              <ScrollArea className="h-[420px]">
-                <div className="space-y-1">
+              <ScrollArea className="h-[400px]">
+                <div className="space-y-0.5">
                   {auditLogs.data.map((log) => {
                     const Icon = auditActionIcons[log.action] || Activity;
                     const color = auditActionColors[log.action] || "text-muted-foreground";
@@ -365,19 +383,17 @@ export default function DashboardPage() {
                     return (
                       <div
                         key={log.id}
-                        className="flex items-start gap-3 rounded-md px-2 py-2.5 hover:bg-muted/40 transition-colors"
+                        className="flex items-start gap-3 rounded-md px-2 py-2 hover:bg-muted/50 transition-colors"
                       >
                         <div className="mt-0.5 shrink-0">
-                          <Icon className={`h-4 w-4 ${color}`} />
+                          <Icon className={`h-3.5 w-3.5 ${color}`} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-medium">
-                              {auditActionLabels[log.action] || log.action}
-                            </span>
-                          </div>
+                          <span className="text-xs font-medium">
+                            {auditActionLabels[log.action] || log.action}
+                          </span>
                           {log.detail && (
-                            <p className="mt-0.5 text-xs text-muted-foreground truncate">
+                            <p className="text-xs text-muted-foreground truncate">
                               {log.detail}
                             </p>
                           )}
@@ -400,55 +416,28 @@ export default function DashboardPage() {
 
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
-function PipelineStage({
+function QueueCard({
   label,
   count,
-  color,
-  total,
-  onClick,
-  isAlert,
-}: {
-  label: string;
-  count: number;
-  color: string;
-  total: number;
-  onClick?: () => void;
-  isAlert?: boolean;
-}) {
-  return (
-    <button
-      className="flex-1 rounded-lg border p-3 text-center hover:bg-muted/50 transition-colors cursor-pointer min-w-0"
-      onClick={onClick}
-    >
-      <div className="flex items-center justify-center gap-1.5 mb-1">
-        <div className={`h-2 w-2 rounded-full ${color} ${isAlert ? "animate-pulse" : ""}`} />
-        <span className="text-2xl font-bold tabular-nums">{count}</span>
-      </div>
-      <p className="text-[11px] text-muted-foreground font-medium truncate">{label}</p>
-    </button>
-  );
-}
-
-function KPICard({
-  label,
-  value,
   icon: Icon,
   color,
   bgColor,
   loading,
   onClick,
+  alert,
 }: {
   label: string;
-  value: number;
+  count: number;
   icon: typeof Package;
   color: string;
   bgColor: string;
   loading?: boolean;
   onClick?: () => void;
+  alert?: boolean;
 }) {
   return (
     <Card
-      className={onClick ? "cursor-pointer hover:bg-muted/40 transition-colors" : ""}
+      className={`cursor-pointer hover:shadow-md transition-shadow ${alert ? "ring-1 ring-destructive/20" : ""}`}
       onClick={onClick}
     >
       <CardContent className="p-4">
@@ -457,10 +446,10 @@ function KPICard({
         ) : (
           <div className="flex items-center gap-3">
             <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${bgColor}`}>
-              <Icon className={`h-5 w-5 ${color}`} />
+              <Icon className={`h-5 w-5 ${color} ${alert ? "animate-pulse" : ""}`} />
             </div>
             <div className="min-w-0">
-              <p className="text-2xl font-bold tabular-nums">{value}</p>
+              <p className="text-2xl font-bold tabular-nums">{count}</p>
               <p className="text-xs text-muted-foreground truncate">{label}</p>
             </div>
           </div>

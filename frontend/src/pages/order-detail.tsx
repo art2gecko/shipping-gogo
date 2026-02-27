@@ -239,16 +239,16 @@ export default function OrderDetailPage() {
           <CardTitle className="text-base">Items</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
+          <div className="rounded-lg border bg-card overflow-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b bg-muted/50">
-                  <th className="px-4 py-3 text-left font-medium">SKU</th>
-                  <th className="px-4 py-3 text-left font-medium">Title</th>
-                  <th className="px-4 py-3 text-center font-medium">Qty</th>
-                  <th className="px-4 py-3 text-center font-medium">Serial Required</th>
-                  <th className="px-4 py-3 text-left font-medium">Bin</th>
-                  <th className="px-4 py-3 text-left font-medium">Serials</th>
+                <tr className="border-b bg-muted/60">
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">SKU</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Title</th>
+                  <th className="px-4 py-3 text-center text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Qty</th>
+                  <th className="px-4 py-3 text-center text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Serial Required</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Bin</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Serials</th>
                 </tr>
               </thead>
               <tbody>

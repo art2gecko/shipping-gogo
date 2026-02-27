@@ -374,7 +374,7 @@ function CredentialsDialog({
                 <Label className="flex items-center gap-2">
                   {field.label}
                   {field.configured && (
-                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                    <CheckCircle2 className="h-3.5 w-3.5 text-success" />
                   )}
                 </Label>
                 <Input

@@ -102,12 +102,12 @@ export function DataTable<T>({
 
   return (
     <div className={cn("space-y-2", className)}>
-      <div className="rounded-md border overflow-auto">
+      <div className="rounded-lg border bg-card overflow-auto shadow-sm">
         <table className="w-full text-sm">
           <thead className="sticky top-0 z-10">
-            <tr className="border-b bg-muted/50">
+            <tr className="border-b bg-muted/60">
               {selectable && (
-                <th className="w-10 px-3 py-2.5">
+                <th className="w-10 px-3 py-3">
                   <Checkbox
                     checked={allSelected}
                     onCheckedChange={toggleAll}
@@ -118,7 +118,7 @@ export function DataTable<T>({
                 <th
                   key={col.key}
                   className={cn(
-                    "px-3 py-2.5 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider",
+                    "px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider",
                     col.sortable &&
                       "cursor-pointer select-none hover:text-foreground",
                     col.className,
@@ -163,7 +163,7 @@ export function DataTable<T>({
                   <tr
                     key={key}
                     className={cn(
-                      "border-b transition-colors hover:bg-muted/40",
+                      "border-b transition-colors hover:bg-muted/50",
                       selected && "bg-primary/5",
                       onRowClick && "cursor-pointer",
                     )}
@@ -171,7 +171,7 @@ export function DataTable<T>({
                   >
                     {selectable && (
                       <td
-                        className="w-10 px-3 py-2.5"
+                        className="w-10 px-3 py-3"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <Checkbox
@@ -183,7 +183,7 @@ export function DataTable<T>({
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className={cn("px-3 py-2.5", col.className)}
+                        className={cn("px-3 py-3", col.className)}
                       >
                         {col.render(row)}
                       </td>

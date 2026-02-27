@@ -239,8 +239,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         ? "h-9 w-9 justify-center mx-auto"
                         : "gap-2.5 px-2.5 py-2",
                       active
-                        ? "bg-sidebar-active text-white border-l-2 border-sidebar-accent"
-                        : "text-sidebar-fg/70 hover:bg-sidebar-hover hover:text-sidebar-fg",
+                        ? "bg-white/12 text-white border-l-[3px] border-white font-semibold"
+                        : "text-sidebar-fg/65 hover:bg-sidebar-hover hover:text-sidebar-fg border-l-[3px] border-transparent",
                     )}
                     onClick={() => {
                       if (window.innerWidth < 1024) toggleSidebar();
@@ -347,37 +347,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Main content */}
         <div className="flex flex-1 flex-col overflow-hidden">
-          {/* ── Top bar (dark green) ── */}
-          <header className="flex h-14 shrink-0 items-center justify-between bg-sidebar-bg text-sidebar-fg border-b border-sidebar-border px-4 lg:px-6">
+          {/* ── Top bar (light) ── */}
+          <header className="flex h-12 shrink-0 items-center justify-between bg-card border-b border-border px-4 lg:px-6">
             <div className="flex items-center gap-3">
               <button
-                className="lg:hidden h-8 w-8 flex items-center justify-center rounded-md text-sidebar-fg/70 hover:text-sidebar-fg hover:bg-sidebar-hover transition-colors"
+                className="lg:hidden h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 onClick={toggleSidebar}
               >
                 <Menu className="h-4 w-4" />
               </button>
-              <h1 className="text-base font-semibold text-white">{pageTitle}</h1>
+              <h1 className="text-sm font-semibold text-foreground">{pageTitle}</h1>
             </div>
             <div className="flex items-center gap-1">
               {/* Command palette trigger */}
               <button
-                className="hidden sm:flex h-8 items-center gap-2 rounded-md border border-sidebar-border bg-sidebar-hover px-3 text-xs text-sidebar-fg/70 hover:text-sidebar-fg hover:bg-white/10 transition-colors"
+                className="hidden sm:flex h-8 items-center gap-2 rounded-md border border-border px-3 text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 onClick={() => setCmdOpen(true)}
               >
                 <Search className="h-3 w-3" />
                 <span>Search...</span>
-                <kbd className="ml-1 pointer-events-none inline-flex h-5 items-center gap-0.5 rounded border border-sidebar-border bg-sidebar-active px-1.5 font-mono text-[10px] font-medium text-sidebar-fg/60">
+                <kbd className="ml-1 pointer-events-none inline-flex h-5 items-center gap-0.5 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                   <Command className="h-2.5 w-2.5" />K
                 </kbd>
               </button>
               <button
-                className="sm:hidden h-8 w-8 flex items-center justify-center rounded-md text-sidebar-fg/70 hover:text-sidebar-fg hover:bg-sidebar-hover transition-colors"
+                className="sm:hidden h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 onClick={() => setCmdOpen(true)}
               >
                 <Search className="h-4 w-4" />
               </button>
               <button
-                className="h-8 w-8 flex items-center justify-center rounded-md text-sidebar-fg/70 hover:text-sidebar-fg hover:bg-sidebar-hover transition-colors"
+                className="h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                 onClick={toggleDarkMode}
                 title="Toggle theme"
               >
@@ -391,7 +391,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </header>
 
           {/* Page content (light workspace) */}
-          <main className="flex-1 overflow-auto bg-background">{children}</main>
+          <main className="flex-1 overflow-auto bg-background">
+            <div className="mx-auto max-w-7xl">{children}</div>
+          </main>
         </div>
 
         {/* Command Palette */}

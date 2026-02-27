@@ -14,14 +14,14 @@
   --primary-foreground: 0 0% 100%;
   --secondary: 214 32% 91%;       /* light neutral */
   --secondary-foreground: 222 47% 11%;
-  --muted: 210 11% 93%;
-  --muted-foreground: 215 16% 47%; /* #64748B mutedText */
+  --muted: 220 14% 96%;
+  --muted-foreground: 215 25% 35%; /* #475569 slate-600 – readable secondary text */
   --accent: 209 34% 53%;          /* #5D8DB4 accentBlue */
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 214 32% 91%;          /* #E2E8F0 */
-  --input: 214 32% 91%;
+  --border: 214 32% 87%;          /* #D7DEE7 – slightly stronger for card edges */
+  --input: 214 32% 87%;
   --ring: 152 72% 25%;            /* primaryGreen focus ring */
   --radius: 0.5rem;
 
@@ -105,8 +105,8 @@
   --primary-foreground: 150 100% 5%;
   --secondary: 150 20% 14%;
   --secondary-foreground: 144 18% 91%;
-  --muted: 150 20% 14%;
-  --muted-foreground: 144 10% 60%;
+  --muted: 150 15% 15%;
+  --muted-foreground: 144 10% 65%;
   --accent: 209 34% 53%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 72% 51%;
