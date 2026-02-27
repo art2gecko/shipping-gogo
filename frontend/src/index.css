@@ -2,266 +2,271 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * ── Color System ──
+ * Uses direct hex values in :root/.dark, referenced via var() in @theme inline.
+ * Tailwind v4 resolves var() at runtime, so opacity modifiers (/10, /50 etc) work.
+ */
+
 :root {
-  /* ── ShipStation-inspired Light Theme ── */
-  --background: 210 11% 95%;      /* #F1F2F3 canvas */
-  --foreground: 222 47% 11%;      /* #0F172A text */
-  --card: 0 0% 100%;              /* #FFFFFF surface */
-  --card-foreground: 222 47% 11%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --primary: 152 72% 25%;         /* #126C41 primaryGreen */
-  --primary-foreground: 0 0% 100%;
-  --secondary: 214 32% 91%;       /* light neutral */
-  --secondary-foreground: 222 47% 11%;
-  --muted: 220 14% 96%;
-  --muted-foreground: 215 25% 35%; /* #475569 slate-600 – readable secondary text */
-  --accent: 209 34% 53%;          /* #5D8DB4 accentBlue */
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 214 32% 87%;          /* #D7DEE7 – slightly stronger for card edges */
-  --input: 214 32% 87%;
-  --ring: 152 72% 25%;            /* primaryGreen focus ring */
+  /* ── Core palette (slate neutrals + blue primary) ── */
+  --background: #f8fafc;         /* slate-50 */
+  --foreground: #0f172a;         /* slate-900 */
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #2563eb;            /* blue-600 */
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;          /* slate-100 */
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;              /* slate-100 */
+  --muted-foreground: #64748b;   /* slate-500 */
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --destructive: #dc2626;        /* red-600 */
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;             /* slate-200 */
+  --input: #e2e8f0;
+  --ring: #2563eb;
   --radius: 0.5rem;
 
-  --success: 152 69% 40%;
-  --success-foreground: 0 0% 100%;
-  --warning: 38 92% 50%;
-  --warning-foreground: 38 95% 12%;
+  /* ── Semantic ── */
+  --success: #16a34a;            /* green-600 */
+  --success-foreground: #ffffff;
+  --warning: #d97706;            /* amber-600 */
+  --warning-foreground: #451a03;
 
-  /* ── Sidebar (dark green) ── */
-  --sidebar-bg: 150 100% 10%;     /* #003311 brandGreen900 */
-  --sidebar-fg: 144 18% 91%;      /* #EAF2ED soft light */
-  --sidebar-muted: 144 18% 91%;
-  --sidebar-hover: 0 0% 100% / 0.06;
-  --sidebar-active: 0 0% 100% / 0.10;
-  --sidebar-accent: 209 34% 53%;  /* accentBlue */
-  --sidebar-border: 0 0% 100% / 0.08;
+  /* ── Sidebar (dark slate) ── */
+  --sidebar-bg: #0f172a;         /* slate-900 */
+  --sidebar-fg: #e2e8f0;         /* slate-200 */
+  --sidebar-muted: #94a3b8;      /* slate-400 */
+  --sidebar-hover: #1e293b;      /* slate-800 */
+  --sidebar-active: #1e293b;
+  --sidebar-accent: #3b82f6;     /* blue-500 */
+  --sidebar-border: #1e293b;     /* slate-800 */
 
-  /* ── Shipping state colors ── */
-  --status-new: 220 14% 62%;
-  --status-new-foreground: 0 0% 100%;
-  --status-ready: 189 75% 41%;
-  --status-ready-foreground: 0 0% 100%;
-  --status-shipped: 152 69% 40%;
-  --status-shipped-foreground: 0 0% 100%;
-  --status-hold: 38 92% 50%;
-  --status-hold-foreground: 38 95% 12%;
-  --status-error: 0 84% 60%;
-  --status-error-foreground: 0 0% 100%;
-  --status-canceled: 220 9% 58%;
-  --status-canceled-foreground: 0 0% 100%;
-  --status-pending: 220 14% 72%;
-  --status-pending-foreground: 220 39% 11%;
-  --status-label-purchased: 262 68% 56%;
-  --status-label-purchased-foreground: 0 0% 100%;
-  --status-packed: 189 75% 34%;
-  --status-packed-foreground: 0 0% 100%;
+  /* ── Order status ── */
+  --status-new: #6b7280;         /* gray-500 */
+  --status-new-foreground: #ffffff;
+  --status-ready: #2563eb;       /* blue-600 */
+  --status-ready-foreground: #ffffff;
+  --status-shipped: #16a34a;     /* green-600 */
+  --status-shipped-foreground: #ffffff;
+  --status-hold: #d97706;        /* amber-600 */
+  --status-hold-foreground: #451a03;
+  --status-error: #dc2626;       /* red-600 */
+  --status-error-foreground: #ffffff;
+  --status-canceled: #9ca3af;    /* gray-400 */
+  --status-canceled-foreground: #ffffff;
+  --status-pending: #9ca3af;     /* gray-400 */
+  --status-pending-foreground: #1f2937;
+  --status-label-purchased: #7c3aed;  /* violet-600 */
+  --status-label-purchased-foreground: #ffffff;
+  --status-packed: #0891b2;      /* cyan-600 */
+  --status-packed-foreground: #ffffff;
 
-  /* ── Marketplace brand colors ── */
-  --channel-amazon: 33 100% 50%;
-  --channel-amazon-foreground: 0 0% 100%;
-  --channel-ebay: 196 80% 44%;
-  --channel-ebay-foreground: 0 0% 100%;
-  --channel-walmart: 220 70% 45%;
-  --channel-walmart-foreground: 0 0% 100%;
-  --channel-temu: 330 65% 48%;
-  --channel-temu-foreground: 0 0% 100%;
+  /* ── Channel brands ── */
+  --channel-amazon: #ff9900;
+  --channel-amazon-foreground: #1a1a1a;
+  --channel-ebay: #0064d2;
+  --channel-ebay-foreground: #ffffff;
+  --channel-walmart: #0071ce;
+  --channel-walmart-foreground: #ffffff;
+  --channel-temu: #f55f1f;
+  --channel-temu-foreground: #ffffff;
 
-  /* ── Audit/activity icon colors ── */
-  --audit-import: 220 14% 62%;
-  --audit-batch: 262 50% 52%;
-  --audit-label: 262 68% 56%;
-  --audit-serial: 152 69% 40%;
-  --audit-tracking: 189 75% 41%;
-  --audit-exception: 0 84% 60%;
-  --audit-resolved: 152 69% 40%;
-  --audit-neutral: 220 9% 46%;
-  --audit-integration: 152 72% 25%;
+  /* ── Audit feed icon colors ── */
+  --audit-import: #6b7280;
+  --audit-batch: #7c3aed;
+  --audit-label: #7c3aed;
+  --audit-serial: #16a34a;
+  --audit-tracking: #0891b2;
+  --audit-exception: #dc2626;
+  --audit-resolved: #16a34a;
+  --audit-neutral: #9ca3af;
+  --audit-integration: #2563eb;
 
-  /* ── Dashboard KPI accent colors ── */
-  --kpi-unshipped: 220 14% 62%;
-  --kpi-unshipped-bg: 220 14% 95%;
-  --kpi-ready: 189 75% 41%;
-  --kpi-ready-bg: 189 75% 95%;
-  --kpi-labels: 262 68% 56%;
-  --kpi-labels-bg: 262 68% 95%;
-  --kpi-batches: 262 50% 52%;
-  --kpi-batches-bg: 262 50% 95%;
+  /* ── Dashboard KPI ── */
+  --kpi-unshipped: #6b7280;
+  --kpi-unshipped-bg: #f3f4f6;
+  --kpi-ready: #2563eb;
+  --kpi-ready-bg: #eff6ff;
+  --kpi-labels: #7c3aed;
+  --kpi-labels-bg: #f5f3ff;
+  --kpi-batches: #0891b2;
+  --kpi-batches-bg: #ecfeff;
 
   --sidebar-width: 14rem;
   --sidebar-width-collapsed: 3.5rem;
 }
 
 .dark {
-  --background: 150 40% 5%;
-  --foreground: 144 18% 91%;
-  --card: 150 35% 8%;
-  --card-foreground: 144 18% 91%;
-  --popover: 150 35% 7%;
-  --popover-foreground: 144 18% 91%;
-  --primary: 152 60% 45%;
-  --primary-foreground: 150 100% 5%;
-  --secondary: 150 20% 14%;
-  --secondary-foreground: 144 18% 91%;
-  --muted: 150 15% 15%;
-  --muted-foreground: 144 10% 65%;
-  --accent: 209 34% 53%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 150 15% 16%;
-  --input: 150 15% 16%;
-  --ring: 152 60% 45%;
+  --background: #020617;         /* slate-950 */
+  --foreground: #f8fafc;         /* slate-50 */
+  --card: #0f172a;               /* slate-900 */
+  --card-foreground: #f8fafc;
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
+  --primary: #3b82f6;            /* blue-500 */
+  --primary-foreground: #ffffff;
+  --secondary: #1e293b;          /* slate-800 */
+  --secondary-foreground: #f8fafc;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;   /* slate-400 */
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  --destructive: #ef4444;        /* red-500 */
+  --destructive-foreground: #ffffff;
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #3b82f6;
 
-  --success: 152 60% 45%;
-  --success-foreground: 152 60% 10%;
-  --warning: 38 90% 55%;
-  --warning-foreground: 38 90% 10%;
+  --success: #22c55e;            /* green-500 */
+  --success-foreground: #052e16;
+  --warning: #f59e0b;            /* amber-500 */
+  --warning-foreground: #451a03;
 
-  --sidebar-bg: 150 100% 7%;
-  --sidebar-fg: 144 18% 91%;
-  --sidebar-hover: 0 0% 100% / 0.06;
-  --sidebar-active: 0 0% 100% / 0.10;
-  --sidebar-border: 0 0% 100% / 0.06;
+  --sidebar-bg: #020617;         /* slate-950 */
+  --sidebar-fg: #e2e8f0;
+  --sidebar-muted: #94a3b8;
+  --sidebar-hover: #1e293b;
+  --sidebar-active: #1e293b;
+  --sidebar-accent: #3b82f6;
+  --sidebar-border: #1e293b;
 
-  /* Shipping state colors (dark) */
-  --status-new: 220 20% 60%;
-  --status-new-foreground: 220 20% 10%;
-  --status-ready: 189 65% 48%;
-  --status-ready-foreground: 189 65% 8%;
-  --status-shipped: 152 60% 45%;
-  --status-shipped-foreground: 152 60% 10%;
-  --status-hold: 38 90% 55%;
-  --status-hold-foreground: 38 90% 10%;
-  --status-error: 0 72% 51%;
-  --status-error-foreground: 0 0% 100%;
-  --status-canceled: 220 10% 50%;
-  --status-canceled-foreground: 220 10% 95%;
-  --status-pending: 220 15% 50%;
-  --status-pending-foreground: 220 15% 95%;
-  --status-label-purchased: 262 58% 62%;
-  --status-label-purchased-foreground: 262 58% 10%;
-  --status-packed: 189 55% 40%;
-  --status-packed-foreground: 189 55% 95%;
+  --status-new: #9ca3af;
+  --status-new-foreground: #1f2937;
+  --status-ready: #3b82f6;
+  --status-ready-foreground: #ffffff;
+  --status-shipped: #22c55e;
+  --status-shipped-foreground: #052e16;
+  --status-hold: #f59e0b;
+  --status-hold-foreground: #451a03;
+  --status-error: #ef4444;
+  --status-error-foreground: #ffffff;
+  --status-canceled: #6b7280;
+  --status-canceled-foreground: #f3f4f6;
+  --status-pending: #6b7280;
+  --status-pending-foreground: #f3f4f6;
+  --status-label-purchased: #8b5cf6;
+  --status-label-purchased-foreground: #ffffff;
+  --status-packed: #06b6d4;
+  --status-packed-foreground: #ffffff;
 
-  /* Marketplace brand colors (dark) */
-  --channel-amazon: 33 95% 55%;
-  --channel-amazon-foreground: 33 95% 8%;
-  --channel-ebay: 196 70% 50%;
-  --channel-ebay-foreground: 196 70% 8%;
-  --channel-walmart: 220 65% 55%;
-  --channel-walmart-foreground: 220 65% 8%;
-  --channel-temu: 330 60% 58%;
-  --channel-temu-foreground: 330 60% 8%;
+  --channel-amazon: #fbbf24;
+  --channel-amazon-foreground: #1a1a1a;
+  --channel-ebay: #60a5fa;
+  --channel-ebay-foreground: #ffffff;
+  --channel-walmart: #60a5fa;
+  --channel-walmart-foreground: #ffffff;
+  --channel-temu: #fb923c;
+  --channel-temu-foreground: #ffffff;
 
-  /* Audit/activity icon colors (dark) */
-  --audit-import: 220 20% 60%;
-  --audit-batch: 262 45% 58%;
-  --audit-label: 262 58% 62%;
-  --audit-serial: 152 60% 45%;
-  --audit-tracking: 189 65% 48%;
-  --audit-exception: 0 72% 51%;
-  --audit-resolved: 152 60% 45%;
-  --audit-neutral: 144 10% 60%;
-  --audit-integration: 152 60% 45%;
+  --audit-import: #9ca3af;
+  --audit-batch: #8b5cf6;
+  --audit-label: #8b5cf6;
+  --audit-serial: #22c55e;
+  --audit-tracking: #06b6d4;
+  --audit-exception: #ef4444;
+  --audit-resolved: #22c55e;
+  --audit-neutral: #6b7280;
+  --audit-integration: #3b82f6;
 
-  /* Dashboard KPI accent colors (dark) */
-  --kpi-unshipped: 220 20% 60%;
-  --kpi-unshipped-bg: 220 25% 22%;
-  --kpi-ready: 189 65% 48%;
-  --kpi-ready-bg: 189 40% 22%;
-  --kpi-labels: 262 58% 62%;
-  --kpi-labels-bg: 262 35% 22%;
-  --kpi-batches: 262 45% 58%;
-  --kpi-batches-bg: 262 30% 22%;
+  --kpi-unshipped: #9ca3af;
+  --kpi-unshipped-bg: #1e293b;
+  --kpi-ready: #3b82f6;
+  --kpi-ready-bg: #1e3a5f;
+  --kpi-labels: #8b5cf6;
+  --kpi-labels-bg: #2e1065;
+  --kpi-batches: #06b6d4;
+  --kpi-batches-bg: #164e63;
 }
 
 @theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-success: hsl(var(--success));
-  --color-success-foreground: hsl(var(--success-foreground));
-  --color-warning: hsl(var(--warning));
-  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
 
   /* Sidebar */
-  --color-sidebar-bg: hsl(var(--sidebar-bg));
-  --color-sidebar-fg: hsl(var(--sidebar-fg));
-  --color-sidebar-muted: hsl(var(--sidebar-muted));
-  --color-sidebar-hover: hsl(var(--sidebar-hover));
-  --color-sidebar-active: hsl(var(--sidebar-active));
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-fg: var(--sidebar-fg);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-hover: var(--sidebar-hover);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-border: var(--sidebar-border);
 
   /* Shipping states */
-  --color-status-new: hsl(var(--status-new));
-  --color-status-new-foreground: hsl(var(--status-new-foreground));
-  --color-status-ready: hsl(var(--status-ready));
-  --color-status-ready-foreground: hsl(var(--status-ready-foreground));
-  --color-status-shipped: hsl(var(--status-shipped));
-  --color-status-shipped-foreground: hsl(var(--status-shipped-foreground));
-  --color-status-hold: hsl(var(--status-hold));
-  --color-status-hold-foreground: hsl(var(--status-hold-foreground));
-  --color-status-error: hsl(var(--status-error));
-  --color-status-error-foreground: hsl(var(--status-error-foreground));
-  --color-status-canceled: hsl(var(--status-canceled));
-  --color-status-canceled-foreground: hsl(var(--status-canceled-foreground));
-  --color-status-pending: hsl(var(--status-pending));
-  --color-status-pending-foreground: hsl(var(--status-pending-foreground));
-  --color-status-label-purchased: hsl(var(--status-label-purchased));
-  --color-status-label-purchased-foreground: hsl(var(--status-label-purchased-foreground));
-  --color-status-packed: hsl(var(--status-packed));
-  --color-status-packed-foreground: hsl(var(--status-packed-foreground));
+  --color-status-new: var(--status-new);
+  --color-status-new-foreground: var(--status-new-foreground);
+  --color-status-ready: var(--status-ready);
+  --color-status-ready-foreground: var(--status-ready-foreground);
+  --color-status-shipped: var(--status-shipped);
+  --color-status-shipped-foreground: var(--status-shipped-foreground);
+  --color-status-hold: var(--status-hold);
+  --color-status-hold-foreground: var(--status-hold-foreground);
+  --color-status-error: var(--status-error);
+  --color-status-error-foreground: var(--status-error-foreground);
+  --color-status-canceled: var(--status-canceled);
+  --color-status-canceled-foreground: var(--status-canceled-foreground);
+  --color-status-pending: var(--status-pending);
+  --color-status-pending-foreground: var(--status-pending-foreground);
+  --color-status-label-purchased: var(--status-label-purchased);
+  --color-status-label-purchased-foreground: var(--status-label-purchased-foreground);
+  --color-status-packed: var(--status-packed);
+  --color-status-packed-foreground: var(--status-packed-foreground);
 
   /* Marketplace brands */
-  --color-channel-amazon: hsl(var(--channel-amazon));
-  --color-channel-amazon-foreground: hsl(var(--channel-amazon-foreground));
-  --color-channel-ebay: hsl(var(--channel-ebay));
-  --color-channel-ebay-foreground: hsl(var(--channel-ebay-foreground));
-  --color-channel-walmart: hsl(var(--channel-walmart));
-  --color-channel-walmart-foreground: hsl(var(--channel-walmart-foreground));
-  --color-channel-temu: hsl(var(--channel-temu));
-  --color-channel-temu-foreground: hsl(var(--channel-temu-foreground));
+  --color-channel-amazon: var(--channel-amazon);
+  --color-channel-amazon-foreground: var(--channel-amazon-foreground);
+  --color-channel-ebay: var(--channel-ebay);
+  --color-channel-ebay-foreground: var(--channel-ebay-foreground);
+  --color-channel-walmart: var(--channel-walmart);
+  --color-channel-walmart-foreground: var(--channel-walmart-foreground);
+  --color-channel-temu: var(--channel-temu);
+  --color-channel-temu-foreground: var(--channel-temu-foreground);
 
   /* Audit icon colors */
-  --color-audit-import: hsl(var(--audit-import));
-  --color-audit-batch: hsl(var(--audit-batch));
-  --color-audit-label: hsl(var(--audit-label));
-  --color-audit-serial: hsl(var(--audit-serial));
-  --color-audit-tracking: hsl(var(--audit-tracking));
-  --color-audit-exception: hsl(var(--audit-exception));
-  --color-audit-resolved: hsl(var(--audit-resolved));
-  --color-audit-neutral: hsl(var(--audit-neutral));
-  --color-audit-integration: hsl(var(--audit-integration));
+  --color-audit-import: var(--audit-import);
+  --color-audit-batch: var(--audit-batch);
+  --color-audit-label: var(--audit-label);
+  --color-audit-serial: var(--audit-serial);
+  --color-audit-tracking: var(--audit-tracking);
+  --color-audit-exception: var(--audit-exception);
+  --color-audit-resolved: var(--audit-resolved);
+  --color-audit-neutral: var(--audit-neutral);
+  --color-audit-integration: var(--audit-integration);
 
   /* KPI accents */
-  --color-kpi-unshipped: hsl(var(--kpi-unshipped));
-  --color-kpi-unshipped-bg: hsl(var(--kpi-unshipped-bg));
-  --color-kpi-ready: hsl(var(--kpi-ready));
-  --color-kpi-ready-bg: hsl(var(--kpi-ready-bg));
-  --color-kpi-labels: hsl(var(--kpi-labels));
-  --color-kpi-labels-bg: hsl(var(--kpi-labels-bg));
-  --color-kpi-batches: hsl(var(--kpi-batches));
-  --color-kpi-batches-bg: hsl(var(--kpi-batches-bg));
+  --color-kpi-unshipped: var(--kpi-unshipped);
+  --color-kpi-unshipped-bg: var(--kpi-unshipped-bg);
+  --color-kpi-ready: var(--kpi-ready);
+  --color-kpi-ready-bg: var(--kpi-ready-bg);
+  --color-kpi-labels: var(--kpi-labels);
+  --color-kpi-labels-bg: var(--kpi-labels-bg);
+  --color-kpi-batches: var(--kpi-batches);
+  --color-kpi-batches-bg: var(--kpi-batches-bg);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -278,7 +283,6 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Tabular figures for KPI numbers */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }

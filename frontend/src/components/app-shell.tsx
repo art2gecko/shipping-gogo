@@ -202,7 +202,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {/* Logo */}
           <div className="flex h-14 shrink-0 items-center border-b border-sidebar-border px-3">
             <Link to="/" className="flex items-center gap-2.5 min-w-0">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-accent text-white">
                 <Package className="h-4 w-4" />
               </div>
               {!sidebarCollapsed && (
@@ -239,8 +239,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         ? "h-9 w-9 justify-center mx-auto"
                         : "gap-2.5 px-2.5 py-2",
                       active
-                        ? "bg-white/12 text-white border-l-[3px] border-white font-semibold"
-                        : "text-sidebar-fg/65 hover:bg-sidebar-hover hover:text-sidebar-fg border-l-[3px] border-transparent",
+                        ? "bg-sidebar-active text-white font-semibold"
+                        : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-fg",
                     )}
                     onClick={() => {
                       if (window.innerWidth < 1024) toggleSidebar();
@@ -311,7 +311,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     className="flex h-9 w-full items-center justify-center rounded-md hover:bg-sidebar-hover transition-colors"
                     onClick={handleLogout}
                   >
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-white text-xs font-bold">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-sidebar-accent text-white text-xs font-bold">
                       {user?.username?.charAt(0).toUpperCase() || "U"}
                     </div>
                   </button>
@@ -322,7 +322,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Tooltip>
             ) : (
               <div className="flex items-center gap-2 rounded-md px-2 py-1.5">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/15 text-white text-xs font-bold">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-white text-xs font-bold">
                   {user?.username?.charAt(0).toUpperCase() || "U"}
                 </div>
                 <div className="flex-1 min-w-0">
