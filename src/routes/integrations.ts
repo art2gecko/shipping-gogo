@@ -144,9 +144,9 @@ router.post("/:channel/credentials", async (req, res) => {
     }).catch(() => {/* enum may not exist in DB yet */});
 
     res.json({ message: `Saved ${saved.length} credential(s) for ${channel}` });
-  } catch (err) {
+  } catch (err: any) {
     console.error("Save credentials error:", err);
-    res.status(500).json({ error: "Failed to save credentials" });
+    res.status(500).json({ error: `Failed to save credentials: ${err?.message || err}` });
   }
 });
 
