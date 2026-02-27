@@ -102,12 +102,12 @@ export function DataTable<T>({
 
   return (
     <div className={cn("space-y-2", className)}>
-      <div className="rounded-lg border bg-card overflow-auto shadow-sm">
+      <div className="rounded-xl border border-border bg-card overflow-auto shadow-sm">
         <table className="w-full text-sm">
           <thead className="sticky top-0 z-10">
-            <tr className="border-b bg-muted/60">
+            <tr className="border-b border-border bg-background">
               {selectable && (
-                <th className="w-10 px-3 py-3">
+                <th className="w-10 px-4 py-3">
                   <Checkbox
                     checked={allSelected}
                     onCheckedChange={toggleAll}
@@ -118,7 +118,7 @@ export function DataTable<T>({
                 <th
                   key={col.key}
                   className={cn(
-                    "px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider",
+                    "px-4 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider",
                     col.sortable &&
                       "cursor-pointer select-none hover:text-foreground",
                     col.className,
@@ -150,20 +150,21 @@ export function DataTable<T>({
               <tr>
                 <td
                   colSpan={columns.length + (selectable ? 1 : 0)}
-                  className="px-3 py-12 text-center text-muted-foreground"
+                  className="px-4 py-12 text-center text-muted-foreground"
                 >
                   {emptyMessage}
                 </td>
               </tr>
             ) : (
-              paged.map((row) => {
+              paged.map((row, idx) => {
                 const key = keyExtractor(row);
                 const selected = selectedKeys?.has(key);
                 return (
                   <tr
                     key={key}
                     className={cn(
-                      "border-b transition-colors hover:bg-muted/50",
+                      "transition-colors hover:bg-background",
+                      idx < paged.length - 1 && "border-b border-border/50",
                       selected && "bg-primary/5",
                       onRowClick && "cursor-pointer",
                     )}
@@ -171,7 +172,7 @@ export function DataTable<T>({
                   >
                     {selectable && (
                       <td
-                        className="w-10 px-3 py-3"
+                        className="w-10 px-4 py-3"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <Checkbox
@@ -183,7 +184,7 @@ export function DataTable<T>({
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className={cn("px-3 py-3", col.className)}
+                        className={cn("px-4 py-3", col.className)}
                       >
                         {col.render(row)}
                       </td>
@@ -196,7 +197,7 @@ export function DataTable<T>({
         </table>
       </div>
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-1">
+        <div className="flex items-center justify-between px-2 py-1">
           <p className="text-xs text-muted-foreground">
             {selectedKeys && selectedKeys.size > 0
               ? `${selectedKeys.size} selected · `

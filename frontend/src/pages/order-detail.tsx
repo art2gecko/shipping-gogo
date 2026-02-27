@@ -239,10 +239,10 @@ export default function OrderDetailPage() {
           <CardTitle className="text-base">Items</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-lg border bg-card overflow-auto">
+          <div className="rounded-xl border border-border bg-card overflow-auto shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b bg-muted/60">
+                <tr className="border-b border-border bg-background">
                   <th className="px-4 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">SKU</th>
                   <th className="px-4 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Title</th>
                   <th className="px-4 py-3 text-center text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Qty</th>
@@ -252,8 +252,8 @@ export default function OrderDetailPage() {
                 </tr>
               </thead>
               <tbody>
-                {order.items?.map((item) => (
-                  <tr key={item.id} className="border-b">
+                {order.items?.map((item, idx) => (
+                  <tr key={item.id} className={idx < (order.items?.length ?? 0) - 1 ? "border-b border-border/50" : ""}>
                     <td className="px-4 py-3 font-mono font-medium">{item.sku}</td>
                     <td className="px-4 py-3">{item.title}</td>
                     <td className="px-4 py-3 text-center">{item.quantity}</td>

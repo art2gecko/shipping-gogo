@@ -133,7 +133,7 @@ export default function OrdersPage() {
         sortable: true,
         render: (o) => (
           <div className="min-w-0">
-            <p className="font-medium text-sm">{o.externalOrderId}</p>
+            <p className="font-medium text-sm text-foreground">{o.externalOrderId}</p>
             <p className="text-[11px] text-muted-foreground font-mono">
               {o.id.slice(0, 8)}
             </p>
@@ -157,7 +157,7 @@ export default function OrdersPage() {
         sortable: true,
         render: (o) => (
           <div className="min-w-0">
-            <p className="font-medium text-sm truncate">{o.shipToName}</p>
+            <p className="font-medium text-sm text-foreground truncate">{o.shipToName}</p>
             <p className="text-[11px] text-muted-foreground">
               {o.shipToCity}, {o.shipToState}
             </p>
@@ -169,7 +169,7 @@ export default function OrdersPage() {
         header: "Items",
         className: "w-16",
         render: (o) => (
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm tabular-nums text-foreground">
             {o.items?.length || 0}
           </span>
         ),
@@ -185,7 +185,7 @@ export default function OrdersPage() {
             <div className="min-w-0">
               <ShipmentStatusBadge status={o.shipment.status} />
               {o.shipment.trackingNumber && (
-                <p className="text-[10px] font-mono text-muted-foreground mt-0.5 truncate max-w-[120px]">
+                <p className="text-[10px] font-mono text-muted-foreground mt-0.5 truncate max-w-[140px]">
                   {o.shipment.trackingNumber}
                 </p>
               )}
@@ -199,7 +199,7 @@ export default function OrdersPage() {
         sortable: true,
         className: "w-28",
         render: (o) => (
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-muted-foreground tabular-nums">
             {formatDate(o.orderDate)}
           </span>
         ),
