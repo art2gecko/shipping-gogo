@@ -33,7 +33,7 @@ const CHANNEL_CREDENTIAL_FIELDS: Record<ValidChannel, CredentialField[]> = {
   ebay: [
     { envKey: "EBAY_CLIENT_ID", label: "Client ID", secret: false },
     { envKey: "EBAY_CLIENT_SECRET", label: "Client Secret", secret: true },
-    { envKey: "EBAY_REDIRECT_URI", label: "Redirect URI", secret: false, defaultValue: "http://localhost:3000/api/integrations/ebay/callback" },
+    { envKey: "EBAY_REDIRECT_URI", label: "RuName (Redirect URL Name)", secret: false },
   ],
   amazon: [
     { envKey: "AMAZON_LWA_CLIENT_ID", label: "LWA Client ID", secret: false },
